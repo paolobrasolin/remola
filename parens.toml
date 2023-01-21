@@ -1,0 +1,19 @@
+[[generators]]
+label = "0"
+source = []
+target = ["A"]
+
+[[generators]]
+label = "("
+source = ["A"]
+target = ["B", "A"]
+
+[[generators]]
+label = ")"
+source = ["B", "A"]
+target = ["A"]
+
+[[generators]]
+label = "1"
+source = ["A"]
+target = []
