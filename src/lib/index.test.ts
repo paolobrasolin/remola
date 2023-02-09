@@ -68,10 +68,10 @@ test("compose moar", () => {
   ]);
 });
 
-xtest("explore", () => {
-  const start: [number, number][] = [[0, 0b0]];
-  const store = new Map<[number, number], Set<[number, number]>>();
+test("explore", () => {
+  const start: [number, number][] = [[0, 0b00]];
+  const store = new Map<number, Set<number>>();
   expect(store).toStrictEqual(new Map());
-  explore(start, store, 3);
-  expect(store).toStrictEqual(new Map());
+  explore(start, store, 1);
+  expect(store).toStrictEqual(new Map([[0, new Set([1, 4])]]));
 });

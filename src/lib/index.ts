@@ -59,28 +59,27 @@ const PAR = {
 
 export function explore(
   sigs: [number, number][],
-  store: Map<[number, number], Set<[number, number]>>,
+  store: Map<number, Set<number>>,
   depth: number
 ) {
   if (depth < 1) return;
   const other = new Set<[number, number]>();
   sigs.forEach(([coarity, codomain]) => {
-    if (!store.has([coarity, codomain]))
-      store.set([coarity, codomain], new Set());
+    if (!store.has(codomain)) store.set(codomain, new Set());
     Object.values(PAR).forEach((g) => {
       const compositions = compose(
         { arity: 0, domain: 0, coarity, codomain },
         g
       );
       compositions.forEach(([_, f]) => {
-        store.get([coarity, codomain])?.add([f.coarity, f.codomain]);
+        store.get(codomain)?.add(f.codomain);
         other.add([f.coarity, f.codomain]);
       });
     });
   });
 
   explore(
-    [...other].filter((x) => !store.has(x)),
+    [...other].filter(([_, codomain]) => !store.has(codomain)),
     store,
     depth - 1
   );
