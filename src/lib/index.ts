@@ -49,3 +49,39 @@ export function compose(dia: Diagram, gen: Generator): [number, Diagram][] {
   }
   return results;
 }
+
+const PAR = {
+  lRoot: sigFromIdxs([], [1], 2),
+  lNest: sigFromIdxs([1], [2, 1], 2),
+  rNest: sigFromIdxs([2, 1], [1], 2),
+  rRoot: sigFromIdxs([1], [], 2),
+};
+
+export function explore(
+  sigs: [number, number][],
+  store: Map<[number, number], Set<[number, number]>>,
+  depth: number
+) {
+  if (depth < 1) return;
+  const other = new Set<[number, number]>();
+  sigs.forEach(([coarity, codomain]) => {
+    if (!store.has([coarity, codomain]))
+      store.set([coarity, codomain], new Set());
+    Object.values(PAR).forEach((g) => {
+      const compositions = compose(
+        { arity: 0, domain: 0, coarity, codomain },
+        g
+      );
+      compositions.forEach(([_, f]) => {
+        store.get([coarity, codomain])?.add([f.coarity, f.codomain]);
+        other.add([f.coarity, f.codomain]);
+      });
+    });
+  });
+
+  explore(
+    [...other].filter((x) => !store.has(x)),
+    store,
+    depth - 1
+  );
+}

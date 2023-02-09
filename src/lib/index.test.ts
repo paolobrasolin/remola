@@ -1,4 +1,4 @@
-import { compose, indicesToDomain, sigFromIdxs } from "./index";
+import { compose, explore, indicesToDomain, sigFromIdxs } from "./index";
 
 (
   [
@@ -66,4 +66,12 @@ test("compose moar", () => {
     [0, sigFromIdxs([], [...[2, 1], 2, 2, 1], 2)],
     [3, sigFromIdxs([], [1, 2, 2, ...[2, 1]], 2)],
   ]);
+});
+
+xtest("explore", () => {
+  const start: [number, number][] = [[0, 0b0]];
+  const store = new Map<[number, number], Set<[number, number]>>();
+  expect(store).toStrictEqual(new Map());
+  explore(start, store, 3);
+  expect(store).toStrictEqual(new Map());
 });
