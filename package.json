@@ -22,7 +22,7 @@
     "test:watch": "jest --watch",
     "cli": "ts-node src/cli/index.ts",
     "ts-node": "ts-node",
-    "docs": "typedoc --entryPoints src/lib/index.ts",
+    "docs": "typedoc --entryPoints src/lib/index.ts --tsconfig tsconfig.lib.json",
     "clean": "rm -rf dist build package",
     "all": "yarn clean && yarn all:types && yarn all:build",
     "all:types": "yarn lib:types && yarn cli:types && yarn web:types",
