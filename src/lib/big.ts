@@ -40,7 +40,7 @@ export function listCompositionOffsets(
   return results;
 }
 
-export function compose(
+export function listCompositions(
   lho: Signature,
   rho: Signature,
   bits: bigint
@@ -86,7 +86,7 @@ export function explore(
     if (!store.has(sig.valueOf())) store.set(sig.valueOf(), new Set<bigint>());
     Object.values(PAR).forEach((g) => {
       // if (g.dom.arity < 1n) return; // TODO: is this actually right?
-      const compositions = compose(
+      const compositions = listCompositions(
         { dom: Object.assign(0b0n, { arity: 0n }), cod: sig },
         g,
         2n

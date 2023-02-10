@@ -1,5 +1,5 @@
 import {
-  compose,
+  listCompositions,
   explore,
   indicesToDomain,
   listCompositionOffsets,
@@ -52,20 +52,20 @@ describe("listCompositionOffsets", () => {
   });
 });
 
-test("compose", () => {
+test("listCompositions", () => {
   const bits = 2n;
   const lho = sigFromIdcs([], [1n], bits);
   const rho = sigFromIdcs([1n], [2n, 1n], bits);
-  expect(compose(lho, rho, bits)).toStrictEqual([
+  expect(listCompositions(lho, rho, bits)).toStrictEqual([
     [0n, sigFromIdcs([], [2n, 1n], 2n)],
   ]);
 });
 
-test("compose moar", () => {
+test("listCompositions moar", () => {
   const bits = 2n;
   const lho = sigFromIdcs([], [1n, 2n, 2n, 1n], bits);
   const rho = sigFromIdcs([1n], [2n, 1n], bits);
-  expect(compose(lho, rho, bits)).toStrictEqual([
+  expect(listCompositions(lho, rho, bits)).toStrictEqual([
     [0n, sigFromIdcs([], [...[2n, 1n], 2n, 2n, 1n], 2n)],
     [3n, sigFromIdcs([], [1n, 2n, 2n, ...[2n, 1n]], 2n)],
   ]);
