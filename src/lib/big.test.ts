@@ -52,23 +52,42 @@ describe("listCompositionOffsets", () => {
   });
 });
 
-test("listCompositions", () => {
-  const bits = 2n;
-  const lho = sigFromIdcs([], [1n], bits);
-  const rho = sigFromIdcs([1n], [2n, 1n], bits);
-  expect(listCompositions(lho, rho, bits)).toStrictEqual([
-    [0n, sigFromIdcs([], [2n, 1n], 2n)],
-  ]);
-});
-
-test("listCompositions moar", () => {
-  const bits = 2n;
-  const lho = sigFromIdcs([], [1n, 2n, 2n, 1n], bits);
-  const rho = sigFromIdcs([1n], [2n, 1n], bits);
-  expect(listCompositions(lho, rho, bits)).toStrictEqual([
-    [0n, sigFromIdcs([], [...[2n, 1n], 2n, 2n, 1n], 2n)],
-    [3n, sigFromIdcs([], [1n, 2n, 2n, ...[2n, 1n]], 2n)],
-  ]);
+describe("listCompositions", () => {
+  test.each<{
+    bits: number;
+    lho: { dom: number[]; cod: number[] };
+    rho: { dom: number[]; cod: number[] };
+    exp: [number, { dom: number[]; cod: number[] }][];
+  }>([
+    {
+      bits: 2,
+      lho: { dom: [], cod: [1] },
+      rho: { dom: [1], cod: [2, 1] },
+      exp: [[0, { dom: [], cod: [2, 1] }]],
+    },
+    {
+      bits: 2,
+      lho: { dom: [], cod: [1, 2, 2, 1] },
+      rho: { dom: [1], cod: [2, 1] },
+      exp: [
+        [0, { dom: [], cod: [...[2, 1], 2, 2, 1] }],
+        [3, { dom: [], cod: [1, 2, 2, ...[2, 1]] }],
+      ],
+    },
+  ])(
+    "$bits bits: $lho.dom>$lho.cod composes with $rho.dom>$rho.cod in $exp.length ways",
+    ({ bits, lho, rho, exp }) => {
+      const bN = BigInt(bits);
+      const lhoN = sigFromIdcs(lho.dom.map(BigInt), lho.cod.map(BigInt), bN);
+      const rhoN = sigFromIdcs(rho.dom.map(BigInt), rho.cod.map(BigInt), bN);
+      const resN = listCompositions(lhoN, rhoN, bN);
+      const expN = exp.map(([offset, { dom, cod }]) => [
+        BigInt(offset),
+        sigFromIdcs(dom.map(BigInt), cod.map(BigInt), bN),
+      ]);
+      expect(resN).toStrictEqual(expN);
+    }
+  );
 });
 
 // const PAR = {
