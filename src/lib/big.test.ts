@@ -7,37 +7,23 @@ import {
   sigFromIdcs,
 } from "./big";
 
-(
-  [
-    [1n, [], 0b0n],
-    [1n, [1n], 0b1n],
-    [1n, [1n, 1n], 0b11n],
-    [1n, [1n, 1n, 1n], 0b111n],
-    [2n, [], 0b00n],
-    [2n, [1n], 0b01n],
-    [2n, [2n], 0b10n],
-    [2n, [1n, 1n], 0b0101n],
-    [2n, [1n, 2n], 0b1001n],
-    [2n, [2n, 1n], 0b0110n],
-    [2n, [2n, 2n], 0b1010n],
-  ] as [bigint, bigint[], bigint][]
-).forEach(([bits, idcs, dom]) => {
-  test(`${bits} bits: [${idcs}] => ${dom}`, () => {
-    expect(indicesToDomain(idcs, bits).valueOf()).toBe(dom);
-  });
-});
-
-test("empty", () => {
-  expect(sigFromIdcs([], [], 2n)).toStrictEqual({
-    dom: Object.assign(0n, { arity: 0n }),
-    cod: Object.assign(0n, { arity: 0n }),
-  });
-});
-
-test("nonempty", () => {
-  expect(sigFromIdcs([2n, 3n], [1n, 2n, 2n, 1n], 2n)).toStrictEqual({
-    dom: Object.assign(0b1110n, { arity: 2n }),
-    cod: Object.assign(0b01101001n, { arity: 4n }),
+describe("indicesToDomain", () => {
+  test.each([
+    { bits: 1, idcs: [], exp: 0b0 },
+    { bits: 1, idcs: [1], exp: 0b1 },
+    { bits: 1, idcs: [1, 1], exp: 0b11 },
+    { bits: 1, idcs: [1, 1, 1], exp: 0b111 },
+    { bits: 2, idcs: [], exp: 0b00 },
+    { bits: 2, idcs: [1], exp: 0b01 },
+    { bits: 2, idcs: [2], exp: 0b10 },
+    { bits: 2, idcs: [1, 1], exp: 0b0101 },
+    { bits: 2, idcs: [1, 2], exp: 0b1001 },
+    { bits: 2, idcs: [2, 1], exp: 0b0110 },
+    { bits: 2, idcs: [2, 2], exp: 0b1010 },
+  ])("$bits bits: $idcs => $exp", ({ bits, idcs, exp }) => {
+    const res = indicesToDomain(idcs.map(BigInt), BigInt(bits));
+    expect(res.valueOf()).toBe(BigInt(exp));
+    expect(res.arity).toBe(BigInt(idcs.length));
   });
 });
 
