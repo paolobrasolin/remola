@@ -31,7 +31,8 @@ export function listCompositionOffsets(
   bits: bigint
 ): bigint[] {
   const results: bigint[] = [];
-  for (let offset = 0n; offset <= cod.arity - dom.arity + 1n; offset++) {
+  if (cod.arity > 0n && dom.arity < 1n) return results; // TODO: debatable
+  for (let offset = 0n; offset <= cod.arity - dom.arity; offset++) {
     const bitLength = dom.arity * bits;
     const bitOffset = offset * bits;
     const body = (cod & (bits ** (bitLength + bitOffset) - 1n)) >> bitOffset;

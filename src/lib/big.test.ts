@@ -29,6 +29,8 @@ describe("indicesToDomain", () => {
 
 describe("listCompositionOffsets", () => {
   test.each([
+    { bits: 2, cod: [], dom: [], exp: [0] }, // TODO: debatable
+    { bits: 2, cod: [1], dom: [], exp: [] }, // TODO: debatable
     { bits: 2, cod: [], dom: [1], exp: [] },
     { bits: 2, cod: [1], dom: [1], exp: [0] },
     { bits: 2, cod: [1, 2, 3], dom: [1], exp: [0] },
@@ -116,16 +118,25 @@ describe("listCompositions", () => {
   );
 });
 
-xtest("explore", () => {
+test("explore", () => {
+  const bits = 2n;
   const balParLangGenerators = [
-    sigFromIdcs([], [1n], 2n),
-    sigFromIdcs([1n], [2n, 1n], 2n),
-    sigFromIdcs([2n, 1n], [1n], 2n),
-    sigFromIdcs([1n], [], 2n),
+    sigFromIdcs([], [0b01n], bits),
+    sigFromIdcs([0b01n], [0b10n, 0b01n], bits),
+    sigFromIdcs([0b10n, 0b01n], [0b01n], bits),
+    sigFromIdcs([0b01n], [], bits),
   ];
-  const start: Sig[] = [Object.assign(0b01n, { arity: 1n })];
+  const start: Sig[] = [sigFromIdcs([], [], bits).cod];
   const store = new Map<bigint, Set<bigint>>();
   expect(store).toStrictEqual(new Map());
-  explore(start, store, 1n, balParLangGenerators, 2n);
-  expect(store).toStrictEqual(new Map());
+  explore(start, store, 4n, balParLangGenerators, bits);
+  expect(store).toStrictEqual(
+    new Map([
+      [0b0n, new Set([0b01n])],
+      [0b01n, new Set([0b00n, 0b01_10n])],
+      [0b10n, new Set([])],
+      [0b01_10n, new Set([0b01n, 0b10n, 0b01_10_10n])],
+      [0b01_10_10n, new Set([0b01_10n, 0b10_10n, 0b01_10_10_10n])],
+    ])
+  );
 });
