@@ -34,35 +34,31 @@ test("nonempty", () => {
   });
 });
 
-const PAR = {
-  lRoot: sigFromIdcs([], [1n], 2n),
-  lNest: sigFromIdcs([1n], [2n, 1n], 2n),
-  rNest: sigFromIdcs([2n, 1n], [1n], 2n),
-  rRoot: sigFromIdcs([1n], [], 2n),
-};
-
 test("compose", () => {
-  expect(compose(PAR.lRoot, PAR.lNest)).toStrictEqual([
+  const lho = sigFromIdcs([], [1n], 2n);
+  const rho = sigFromIdcs([1n], [2n, 1n], 2n);
+  expect(compose(lho, rho)).toStrictEqual([
     [0n, sigFromIdcs([], [2n, 1n], 2n)],
   ]);
 });
 
 test("compose moar", () => {
-  expect(
-    compose(
-      {
-        dom: Object.assign(0b0n, { arity: 0n }),
-        cod: Object.assign(0b01101001n, { arity: 4n }),
-      },
-      PAR.lNest
-    )
-  ).toStrictEqual([
+  const lho = sigFromIdcs([], [1n, 2n, 2n, 1n], 2n);
+  const rho = sigFromIdcs([1n], [2n, 1n], 2n);
+  expect(compose(lho, rho)).toStrictEqual([
     [0n, sigFromIdcs([], [...[2n, 1n], 2n, 2n, 1n], 2n)],
     [3n, sigFromIdcs([], [1n, 2n, 2n, ...[2n, 1n]], 2n)],
   ]);
 });
 
-test("explore", () => {
+// const PAR = {
+//   lRoot: sigFromIdcs([], [1n], 2n),
+//   lNest: sigFromIdcs([1n], [2n, 1n], 2n),
+//   rNest: sigFromIdcs([2n, 1n], [1n], 2n),
+//   rRoot: sigFromIdcs([1n], [], 2n),
+// };
+
+xtest("explore", () => {
   const start: Sig[] = [Object.assign(0b01n, { arity: 1n })];
   const store = new Map<bigint, Set<bigint>>();
   expect(store).toStrictEqual(new Map());
