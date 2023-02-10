@@ -54,9 +54,9 @@ describe("listCompositionOffsets", () => {
     { cod: [2, 1, 1, 3], dom: [1], exp: [1, 2] },
     { cod: [2, 1, 3, 1], dom: [1], exp: [1, 3] },
     { cod: [2, 3, 1, 1], dom: [1], exp: [2, 3] },
-    { cod: [1, 2, 3, 4], dom: [1, 2], exp: [0] },
-    { cod: [3, 1, 2, 4], dom: [1, 2], exp: [1] },
-    { cod: [3, 4, 1, 2], dom: [1, 2], exp: [2] },
+    { cod: [1, 2, 3, 3], dom: [1, 2], exp: [0] },
+    { cod: [3, 1, 2, 3], dom: [1, 2], exp: [1] },
+    { cod: [3, 3, 1, 2], dom: [1, 2], exp: [2] },
   ])("$cod accepts $dom at $exp", ({ cod, dom, exp }) => {
     const bits = 2n;
     const lho = sigFromIdcs([], cod.map(BigInt), bits);
