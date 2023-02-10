@@ -28,21 +28,42 @@ export function sigFromIdcs(
   };
 }
 
-export function compose(dia: Diagram, gen: Generator): [bigint, Diagram][] {
-  const results: [bigint, Diagram][] = [];
+export function listCompositionOffsets(
+  dia: Diagram,
+  gen: Generator,
+  bits: bigint
+): bigint[] {
+  const results: bigint[] = [];
   for (
     let offset = 0n;
     offset <= dia.cod.arity - gen.dom.arity + 1n;
     offset++
   ) {
-    const l = gen.dom.arity * 2n;
-    const o = offset * 2n;
-    const body = (dia.cod & (2n ** (l + o) - 1n)) >> o;
+    const bitLength = gen.dom.arity * bits;
+    const bitOffset = offset * bits;
+    const body =
+      (dia.cod & (bits ** (bitLength + bitOffset) - 1n)) >> bitOffset;
+    if (body == gen.dom) results.push(offset);
+  }
+  return results;
+}
+
+export function compose(
+  dia: Diagram,
+  gen: Generator,
+  bits: bigint
+): [bigint, Diagram][] {
+  const results: [bigint, Diagram][] = [];
+  listCompositionOffsets(dia, gen, bits).forEach((offset) => {
+    const l = gen.dom.arity * bits;
+    const o = offset * bits;
+    const body = (dia.cod & (bits ** (l + o) - 1n)) >> o;
     if (body == gen.dom) {
       const head = dia.cod >> (l + o);
-      const tail = dia.cod & (2n ** o - 1n);
+      const tail = dia.cod & (bits ** o - 1n);
       const codomain =
-        (((head << (gen.cod.arity * 2n)) + gen.cod) << (offset * 2n)) + tail;
+        (((head << (gen.cod.arity * bits)) + gen.cod) << (offset * bits)) +
+        tail;
       const signature: Signature = {
         dom: Object.assign(dia.dom, { arity: dia.dom.arity }),
         cod: Object.assign(codomain, {
@@ -51,7 +72,7 @@ export function compose(dia: Diagram, gen: Generator): [bigint, Diagram][] {
       };
       results.push([offset, signature]);
     }
-  }
+  });
   return results;
 }
 
@@ -75,7 +96,8 @@ export function explore(
       // if (g.dom.arity < 1n) return; // TODO: is this actually right?
       const compositions = compose(
         { dom: Object.assign(0b0n, { arity: 0n }), cod: sig },
-        g
+        g,
+        2n
       );
       compositions.forEach(([_, f]) => {
         store.get(sig.valueOf())?.add(f.cod.valueOf());

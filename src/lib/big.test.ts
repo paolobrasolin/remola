@@ -1,4 +1,11 @@
-import { compose, explore, indicesToDomain, Sig, sigFromIdcs } from "./big";
+import {
+  compose,
+  explore,
+  indicesToDomain,
+  listCompositionOffsets,
+  Sig,
+  sigFromIdcs,
+} from "./big";
 
 (
   [
@@ -34,18 +41,45 @@ test("nonempty", () => {
   });
 });
 
+describe("listCompositionOffsets", () => {
+  test.each([
+    { cod: [], dom: [1], exp: [] },
+    { cod: [1], dom: [1], exp: [0] },
+    { cod: [1, 2, 3], dom: [1], exp: [0] },
+    { cod: [2, 1, 3], dom: [1], exp: [1] },
+    { cod: [2, 3, 1], dom: [1], exp: [2] },
+    { cod: [1, 1, 2, 3], dom: [1], exp: [0, 1] },
+    { cod: [1, 2, 1, 3], dom: [1], exp: [0, 2] },
+    { cod: [1, 2, 3, 1], dom: [1], exp: [0, 3] },
+    { cod: [2, 1, 1, 3], dom: [1], exp: [1, 2] },
+    { cod: [2, 1, 3, 1], dom: [1], exp: [1, 3] },
+    { cod: [2, 3, 1, 1], dom: [1], exp: [2, 3] },
+    { cod: [1, 2, 3, 4], dom: [1, 2], exp: [0] },
+    { cod: [3, 1, 2, 4], dom: [1, 2], exp: [1] },
+    { cod: [3, 4, 1, 2], dom: [1, 2], exp: [2] },
+  ])("$cod accepts $dom at $exp", ({ cod, dom, exp }) => {
+    const bits = 2n;
+    const lho = sigFromIdcs([], cod.map(BigInt), bits);
+    const rho = sigFromIdcs(dom.map(BigInt), [], bits);
+    const result = listCompositionOffsets(lho, rho, bits);
+    expect(result).toStrictEqual(exp.map(BigInt));
+  });
+});
+
 test("compose", () => {
-  const lho = sigFromIdcs([], [1n], 2n);
-  const rho = sigFromIdcs([1n], [2n, 1n], 2n);
-  expect(compose(lho, rho)).toStrictEqual([
+  const bits = 2n;
+  const lho = sigFromIdcs([], [1n], bits);
+  const rho = sigFromIdcs([1n], [2n, 1n], bits);
+  expect(compose(lho, rho, bits)).toStrictEqual([
     [0n, sigFromIdcs([], [2n, 1n], 2n)],
   ]);
 });
 
 test("compose moar", () => {
-  const lho = sigFromIdcs([], [1n, 2n, 2n, 1n], 2n);
-  const rho = sigFromIdcs([1n], [2n, 1n], 2n);
-  expect(compose(lho, rho)).toStrictEqual([
+  const bits = 2n;
+  const lho = sigFromIdcs([], [1n, 2n, 2n, 1n], bits);
+  const rho = sigFromIdcs([1n], [2n, 1n], bits);
+  expect(compose(lho, rho, bits)).toStrictEqual([
     [0n, sigFromIdcs([], [...[2n, 1n], 2n, 2n, 1n], 2n)],
     [3n, sigFromIdcs([], [1n, 2n, 2n, ...[2n, 1n]], 2n)],
   ]);
