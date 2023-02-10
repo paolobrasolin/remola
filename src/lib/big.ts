@@ -47,23 +47,18 @@ export function listCompositions(
 ): [bigint, Signature][] {
   const results: [bigint, Signature][] = [];
   listCompositionOffsets(lho.cod, rho.dom, bits).forEach((offset) => {
-    const l = rho.dom.arity * bits;
-    const o = offset * bits;
-    const body = (lho.cod & (bits ** (l + o) - 1n)) >> o;
-    if (body == rho.dom) {
-      const head = lho.cod >> (l + o);
-      const tail = lho.cod & (bits ** o - 1n);
-      const codomain =
-        (((head << (rho.cod.arity * bits)) + rho.cod) << (offset * bits)) +
-        tail;
-      const signature: Signature = {
-        dom: Object.assign(lho.dom, { arity: lho.dom.arity }),
-        cod: Object.assign(codomain, {
-          arity: lho.cod.arity - rho.dom.arity + rho.cod.arity,
-        }),
-      };
-      results.push([offset, signature]);
-    }
+    let sig = lho.cod.valueOf();
+    sig >>= (rho.dom.arity + offset) * bits;
+    sig <<= rho.cod.arity * bits;
+    sig |= rho.cod;
+    sig <<= offset * bits;
+    sig |= lho.cod & (bits ** (offset * bits) - 1n);
+    const arity = lho.cod.arity + rho.cod.arity - rho.dom.arity;
+    const signature: Signature = {
+      dom: Object.assign(lho.dom, { arity: lho.dom.arity }),
+      cod: Object.assign(sig, { arity: arity }),
+    };
+    results.push([offset, signature]);
   });
   return results;
 }
