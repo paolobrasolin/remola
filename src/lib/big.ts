@@ -63,28 +63,23 @@ export function listCompositions(
   return results;
 }
 
-const PAR = {
-  lRoot: sigFromIdcs([], [1n], 2n),
-  lNest: sigFromIdcs([1n], [2n, 1n], 2n),
-  rNest: sigFromIdcs([2n, 1n], [1n], 2n),
-  rRoot: sigFromIdcs([1n], [], 2n),
-};
-
 export function explore(
   sigs: Sig[],
   store: Map<bigint, Set<bigint>>,
-  depth: bigint
+  depth: bigint,
+  generators: Signature[],
+  bits: bigint
 ) {
   if (depth < 1n) return;
   const other = new Set<Sig>();
   sigs.forEach((sig) => {
     if (!store.has(sig.valueOf())) store.set(sig.valueOf(), new Set<bigint>());
-    Object.values(PAR).forEach((g) => {
+    generators.forEach((g) => {
       // if (g.dom.arity < 1n) return; // TODO: is this actually right?
       const compositions = listCompositions(
         { dom: Object.assign(0b0n, { arity: 0n }), cod: sig },
         g,
-        2n
+        bits
       );
       compositions.forEach(([_, f]) => {
         store.get(sig.valueOf())?.add(f.cod.valueOf());
@@ -96,6 +91,8 @@ export function explore(
   explore(
     [...other].filter((x) => !store.has(x.valueOf())),
     store,
-    depth - 1n
+    depth - 1n,
+    generators,
+    bits
   );
 }

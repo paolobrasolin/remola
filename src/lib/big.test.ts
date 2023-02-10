@@ -116,17 +116,16 @@ describe("listCompositions", () => {
   );
 });
 
-// const PAR = {
-//   lRoot: sigFromIdcs([], [1n], 2n),
-//   lNest: sigFromIdcs([1n], [2n, 1n], 2n),
-//   rNest: sigFromIdcs([2n, 1n], [1n], 2n),
-//   rRoot: sigFromIdcs([1n], [], 2n),
-// };
-
 xtest("explore", () => {
+  const balParLangGenerators = [
+    sigFromIdcs([], [1n], 2n),
+    sigFromIdcs([1n], [2n, 1n], 2n),
+    sigFromIdcs([2n, 1n], [1n], 2n),
+    sigFromIdcs([1n], [], 2n),
+  ];
   const start: Sig[] = [Object.assign(0b01n, { arity: 1n })];
   const store = new Map<bigint, Set<bigint>>();
   expect(store).toStrictEqual(new Map());
-  explore(start, store, 2n);
+  explore(start, store, 1n, balParLangGenerators, 2n);
   expect(store).toStrictEqual(new Map());
 });
