@@ -1,14 +1,11 @@
 export const greet = (name: string): string => `Hello ${name}!`;
 
+export type Sig = bigint & { arity: bigint };
+
 interface Signature {
   dom: Sig;
   cod: Sig;
 }
-
-export type Diagram = Signature;
-export type Generator = Signature;
-
-export type Sig = bigint & { arity: bigint };
 
 export function indicesToDomain(indices: bigint[], bits: bigint): Sig {
   return Object.assign(
@@ -44,25 +41,25 @@ export function listCompositionOffsets(
 }
 
 export function compose(
-  dia: Diagram,
-  gen: Generator,
+  lho: Signature,
+  rho: Signature,
   bits: bigint
-): [bigint, Diagram][] {
-  const results: [bigint, Diagram][] = [];
-  listCompositionOffsets(dia.cod, gen.dom, bits).forEach((offset) => {
-    const l = gen.dom.arity * bits;
+): [bigint, Signature][] {
+  const results: [bigint, Signature][] = [];
+  listCompositionOffsets(lho.cod, rho.dom, bits).forEach((offset) => {
+    const l = rho.dom.arity * bits;
     const o = offset * bits;
-    const body = (dia.cod & (bits ** (l + o) - 1n)) >> o;
-    if (body == gen.dom) {
-      const head = dia.cod >> (l + o);
-      const tail = dia.cod & (bits ** o - 1n);
+    const body = (lho.cod & (bits ** (l + o) - 1n)) >> o;
+    if (body == rho.dom) {
+      const head = lho.cod >> (l + o);
+      const tail = lho.cod & (bits ** o - 1n);
       const codomain =
-        (((head << (gen.cod.arity * bits)) + gen.cod) << (offset * bits)) +
+        (((head << (rho.cod.arity * bits)) + rho.cod) << (offset * bits)) +
         tail;
       const signature: Signature = {
-        dom: Object.assign(dia.dom, { arity: dia.dom.arity }),
+        dom: Object.assign(lho.dom, { arity: lho.dom.arity }),
         cod: Object.assign(codomain, {
-          arity: dia.cod.arity - gen.dom.arity + gen.cod.arity,
+          arity: lho.cod.arity - rho.dom.arity + rho.cod.arity,
         }),
       };
       results.push([offset, signature]);
