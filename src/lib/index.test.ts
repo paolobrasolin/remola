@@ -132,7 +132,7 @@ test("explore", () => {
   explore(start, store, 4n, balParLangGenerators, bits);
   expect(store).toStrictEqual(
     new Map([
-      [0b0n, new Set([0b01n])],
+      [0b00n, new Set([0b01n])],
       [0b01n, new Set([0b00n, 0b01_10n])],
       [0b10n, new Set([])],
       [0b01_10n, new Set([0b01n, 0b10n, 0b01_10_10n])],
