@@ -1,86 +1,99 @@
 export const greet = (name: string): string => `Hello ${name}!`;
 
+export type Sig = bigint & { arity: bigint };
+
 interface Signature {
-  arity: number;
-  domain: number;
-  coarity: number;
-  codomain: number;
+  dom: Sig;
+  cod: Sig;
 }
 
-export type Diagram = Signature;
-export type Generator = Signature;
-
-export function indicesToDomain(indices: number[], bits: number): number {
-  return indices.reduce((p, c, i) => p + (c << (i * bits)), 0);
+export function indicesToDomain(indices: bigint[], bits: bigint): Sig {
+  return Object.assign(
+    indices.reduce((p, c, i) => p + (c << (BigInt(i) * bits)), 0n),
+    { arity: BigInt(indices.length) }
+  );
 }
 
-export function sigFromIdxs(
-  domSig: number[],
-  codSig: number[],
-  bits: number
+export function sigFromIdcs(
+  domIdcs: bigint[],
+  codIdcs: bigint[],
+  bits: bigint
 ): Signature {
   return {
-    arity: domSig.length,
-    domain: indicesToDomain(domSig, bits),
-    coarity: codSig.length,
-    codomain: indicesToDomain(codSig, bits),
+    dom: indicesToDomain(domIdcs, bits),
+    cod: indicesToDomain(codIdcs, bits),
   };
 }
 
-export function compose(dia: Diagram, gen: Generator): [number, Diagram][] {
-  const results: [number, Diagram][] = [];
-  for (let offset = 0; offset <= dia.coarity - gen.arity + 1; offset++) {
-    const l = gen.arity * 2;
-    const o = offset * 2;
-    const body = (dia.codomain & (2 ** (l + o) - 1)) >> o;
-    if (body == gen.domain) {
-      const head = dia.codomain >> (l + o);
-      const tail = dia.codomain & (2 ** o - 1);
-      const new_sig =
-        (((head << (gen.coarity * 2)) + gen.codomain) << (offset * 2)) + tail;
-      const signature: Signature = {
-        arity: dia.arity,
-        domain: dia.domain,
-        coarity: dia.coarity - gen.arity + gen.coarity,
-        codomain: new_sig,
-      };
-      results.push([offset, signature]);
-    }
+export function listCompositionOffsets(
+  cod: Sig,
+  dom: Sig,
+  bits: bigint
+): bigint[] {
+  const results: bigint[] = [];
+  if (cod.arity > 0n && dom.arity < 1n) return results; // TODO: debatable
+  for (let offset = 0n; offset <= cod.arity - dom.arity; offset++) {
+    const bitLength = dom.arity * bits;
+    const bitOffset = offset * bits;
+    const body = (cod & (bits ** (bitLength + bitOffset) - 1n)) >> bitOffset;
+    if (body == dom) results.push(offset);
   }
   return results;
 }
 
-const PAR = {
-  lRoot: sigFromIdxs([], [1], 2),
-  lNest: sigFromIdxs([1], [2, 1], 2),
-  rNest: sigFromIdxs([2, 1], [1], 2),
-  rRoot: sigFromIdxs([1], [], 2),
-};
+export function listCompositions(
+  lho: Signature,
+  rho: Signature,
+  bits: bigint
+): [bigint, Signature][] {
+  const results: [bigint, Signature][] = [];
+  listCompositionOffsets(lho.cod, rho.dom, bits).forEach((offset) => {
+    let sig = lho.cod.valueOf();
+    sig >>= (rho.dom.arity + offset) * bits;
+    sig <<= rho.cod.arity * bits;
+    sig |= rho.cod;
+    sig <<= offset * bits;
+    sig |= lho.cod & (bits ** (offset * bits) - 1n);
+    const arity = lho.cod.arity + rho.cod.arity - rho.dom.arity;
+    const signature: Signature = {
+      dom: Object.assign(lho.dom, { arity: lho.dom.arity }),
+      cod: Object.assign(sig, { arity: arity }),
+    };
+    results.push([offset, signature]);
+  });
+  return results;
+}
 
 export function explore(
-  sigs: [number, number][],
-  store: Map<number, Set<number>>,
-  depth: number
+  sigs: Sig[],
+  store: Map<bigint, Set<bigint>>,
+  depth: bigint,
+  generators: Signature[],
+  bits: bigint
 ) {
-  if (depth < 1) return;
-  const other = new Set<[number, number]>();
-  sigs.forEach(([coarity, codomain]) => {
-    if (!store.has(codomain)) store.set(codomain, new Set());
-    Object.values(PAR).forEach((g) => {
-      const compositions = compose(
-        { arity: 0, domain: 0, coarity, codomain },
-        g
+  if (depth < 1n) return;
+  const other = new Set<Sig>();
+  sigs.forEach((sig) => {
+    if (!store.has(sig.valueOf())) store.set(sig.valueOf(), new Set<bigint>());
+    generators.forEach((g) => {
+      // if (g.dom.arity < 1n) return; // TODO: is this actually right?
+      const compositions = listCompositions(
+        { dom: Object.assign(0b0n, { arity: 0n }), cod: sig },
+        g,
+        bits
       );
       compositions.forEach(([_, f]) => {
-        store.get(codomain)?.add(f.codomain);
-        other.add([f.coarity, f.codomain]);
+        store.get(sig.valueOf())?.add(f.cod.valueOf());
+        other.add(f.cod);
       });
     });
   });
 
   explore(
-    [...other].filter(([_, codomain]) => !store.has(codomain)),
+    [...other].filter((x) => !store.has(x.valueOf())),
     store,
-    depth - 1
+    depth - 1n,
+    generators,
+    bits
   );
 }
