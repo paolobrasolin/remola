@@ -29,21 +29,16 @@ export function sigFromIdcs(
 }
 
 export function listCompositionOffsets(
-  dia: Diagram,
-  gen: Generator,
+  cod: Sig,
+  dom: Sig,
   bits: bigint
 ): bigint[] {
   const results: bigint[] = [];
-  for (
-    let offset = 0n;
-    offset <= dia.cod.arity - gen.dom.arity + 1n;
-    offset++
-  ) {
-    const bitLength = gen.dom.arity * bits;
+  for (let offset = 0n; offset <= cod.arity - dom.arity + 1n; offset++) {
+    const bitLength = dom.arity * bits;
     const bitOffset = offset * bits;
-    const body =
-      (dia.cod & (bits ** (bitLength + bitOffset) - 1n)) >> bitOffset;
-    if (body == gen.dom) results.push(offset);
+    const body = (cod & (bits ** (bitLength + bitOffset) - 1n)) >> bitOffset;
+    if (body == dom) results.push(offset);
   }
   return results;
 }
@@ -54,7 +49,7 @@ export function compose(
   bits: bigint
 ): [bigint, Diagram][] {
   const results: [bigint, Diagram][] = [];
-  listCompositionOffsets(dia, gen, bits).forEach((offset) => {
+  listCompositionOffsets(dia.cod, gen.dom, bits).forEach((offset) => {
     const l = gen.dom.arity * bits;
     const o = offset * bits;
     const body = (dia.cod & (bits ** (l + o) - 1n)) >> o;

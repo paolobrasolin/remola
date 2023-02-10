@@ -29,26 +29,26 @@ describe("indicesToDomain", () => {
 
 describe("listCompositionOffsets", () => {
   test.each([
-    { cod: [], dom: [1], exp: [] },
-    { cod: [1], dom: [1], exp: [0] },
-    { cod: [1, 2, 3], dom: [1], exp: [0] },
-    { cod: [2, 1, 3], dom: [1], exp: [1] },
-    { cod: [2, 3, 1], dom: [1], exp: [2] },
-    { cod: [1, 1, 2, 3], dom: [1], exp: [0, 1] },
-    { cod: [1, 2, 1, 3], dom: [1], exp: [0, 2] },
-    { cod: [1, 2, 3, 1], dom: [1], exp: [0, 3] },
-    { cod: [2, 1, 1, 3], dom: [1], exp: [1, 2] },
-    { cod: [2, 1, 3, 1], dom: [1], exp: [1, 3] },
-    { cod: [2, 3, 1, 1], dom: [1], exp: [2, 3] },
-    { cod: [1, 2, 3, 3], dom: [1, 2], exp: [0] },
-    { cod: [3, 1, 2, 3], dom: [1, 2], exp: [1] },
-    { cod: [3, 3, 1, 2], dom: [1, 2], exp: [2] },
-  ])("$cod accepts $dom at $exp", ({ cod, dom, exp }) => {
-    const bits = 2n;
-    const lho = sigFromIdcs([], cod.map(BigInt), bits);
-    const rho = sigFromIdcs(dom.map(BigInt), [], bits);
-    const result = listCompositionOffsets(lho, rho, bits);
-    expect(result).toStrictEqual(exp.map(BigInt));
+    { bits: 2, cod: [], dom: [1], exp: [] },
+    { bits: 2, cod: [1], dom: [1], exp: [0] },
+    { bits: 2, cod: [1, 2, 3], dom: [1], exp: [0] },
+    { bits: 2, cod: [2, 1, 3], dom: [1], exp: [1] },
+    { bits: 2, cod: [2, 3, 1], dom: [1], exp: [2] },
+    { bits: 2, cod: [1, 1, 2, 3], dom: [1], exp: [0, 1] },
+    { bits: 2, cod: [1, 2, 1, 3], dom: [1], exp: [0, 2] },
+    { bits: 2, cod: [1, 2, 3, 1], dom: [1], exp: [0, 3] },
+    { bits: 2, cod: [2, 1, 1, 3], dom: [1], exp: [1, 2] },
+    { bits: 2, cod: [2, 1, 3, 1], dom: [1], exp: [1, 3] },
+    { bits: 2, cod: [2, 3, 1, 1], dom: [1], exp: [2, 3] },
+    { bits: 2, cod: [1, 2, 3, 3], dom: [1, 2], exp: [0] },
+    { bits: 2, cod: [3, 1, 2, 3], dom: [1, 2], exp: [1] },
+    { bits: 2, cod: [3, 3, 1, 2], dom: [1, 2], exp: [2] },
+  ])("$bits bits: $cod accepts $dom at $exp", ({ bits, cod, dom, exp }) => {
+    const b = BigInt(bits);
+    const lho = indicesToDomain(cod.map(BigInt), b);
+    const rho = indicesToDomain(dom.map(BigInt), b);
+    const res = listCompositionOffsets(lho, rho, b);
+    expect(res).toStrictEqual(exp.map(BigInt));
   });
 });
 
