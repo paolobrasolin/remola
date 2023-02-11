@@ -58,6 +58,7 @@
     "vite": "^4.1.1"
   },
   "dependencies": {
+    "@hotwired/stimulus": "^3.2.1",
     "@svgdotjs/svg.js": "^3.1.2",
     "@types/cytoscape": "^3.19.9",
     "cytoscape": "^3.23.0"
