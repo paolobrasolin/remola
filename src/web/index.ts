@@ -2,6 +2,7 @@ import { Application } from "@hotwired/stimulus";
 import TabController from "./controllers/tab_controller";
 import EditorController from "./controllers/editor_controller";
 import GraphController from "./controllers/graph_controller";
+import "./monaco_environment";
 import "./index.css";
 
 const application = Application.start();
