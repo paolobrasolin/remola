@@ -27,3 +27,17 @@
     }
 
 }
+
+@layer components {
+  [role=tablist]{
+    @apply flex border-b text-lg font-medium bg-slate-50;
+  }
+
+  [role=tab]{
+    @apply inline-flex px-6 py-3 gap-2 items-center border-b-2;
+  }
+
+  [role=tab][aria-current]{
+    @apply text-purple-600 border-b-2 border-purple-600;
+  }
+}

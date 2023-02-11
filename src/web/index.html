@@ -5,10 +5,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>remola</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body class="p-10" data-controller="hello">
-  <div id="app" data-hello-target="test"></div>
+<body class="flex flex-col" data-controller="tab">
+
+  <nav role="tablist">
+    <button role="tab" id="grammar-tab" aria-controls="grammar-tabpanel" data-action="click->tab#switch" aria-current>
+      <span class="material-icons">code</span>
+      Grammar
+    </button>
+    <button role="tab" id="explorer-tab" aria-controls="explorer-tabpanel" data-action="click->tab#switch">
+      <span class="material-icons">science</span>
+      Explorer
+    </button>
+    <button role="tab" id="help-tab" aria-controls="help-tabpanel" data-action="click->tab#switch">
+      <span class="material-icons">help</span>
+      Help
+    </button>
+  </nav>
+
+  <main role="region" aria-live="polite">
+    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab">
+      <h1>Grammar</h1>
+    </section>
+    <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" hidden>
+      <h1>Explorer</h1>
+    </section>
+    <section role="tabpanel" id="help-tabpanel" aria-labelledby="help-tab" hidden>
+      <h1>Help</h1>
+    </section>
+  </main>
+
   <script type="module" src="index.ts"></script>
 </body>
 

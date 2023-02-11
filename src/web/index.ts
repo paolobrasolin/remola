@@ -1,6 +1,7 @@
 import { Application } from "@hotwired/stimulus";
-import HelloController from "./controllers/hello_controller";
+import TabController from "./controllers/tab_controller";
+import "./index.css";
 
 const application = Application.start();
-application.register("hello", HelloController);
+application.register("tab", TabController);
 application.debug = true;
