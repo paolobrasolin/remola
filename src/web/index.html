@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body class="flex flex-col" data-controller="tab">
+<body class="flex flex-col w-screen h-screen" data-controller="tab">
 
   <nav role="tablist">
     <button role="tab" id="grammar-tab" aria-controls="grammar-tabpanel" data-action="click->tab#switch" aria-current>
@@ -25,9 +25,10 @@
     </button>
   </nav>
 
-  <main role="region" aria-live="polite">
-    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab">
-      <h1>Grammar</h1>
+  <main role="region" aria-live="polite" class="bg-slate-50 h-full p-6">
+    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full"
+      data-controller="editor">
+      <textarea data-editor-target="textarea" class="font-mono w-full h-full resize-none"></textarea>
     </section>
     <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" hidden>
       <h1>Explorer</h1>

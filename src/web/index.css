@@ -30,11 +30,11 @@
 
 @layer components {
   [role=tablist]{
-    @apply flex border-b text-lg font-medium bg-slate-50;
+    @apply flex border-b text-lg font-medium bg-slate-100;
   }
 
   [role=tab]{
-    @apply inline-flex px-6 py-3 gap-2 items-center border-b-2;
+    @apply inline-flex px-6 py-3 gap-2 items-center border-b-2 bg-slate-50;
   }
 
   [role=tab][aria-current]{
