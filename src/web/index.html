@@ -8,14 +8,14 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
-<body class="flex flex-col w-screen h-screen" data-controller="tab">
+<body class="flex flex-col w-screen h-screen overflow-hidden" data-controller="tab">
 
   <nav role="tablist">
-    <button role="tab" id="grammar-tab" aria-controls="grammar-tabpanel" data-action="click->tab#switch" aria-current>
+    <button role="tab" id="grammar-tab" aria-controls="grammar-tabpanel" data-action="click->tab#switch">
       <span class="material-icons">code</span>
       Grammar
     </button>
-    <button role="tab" id="explorer-tab" aria-controls="explorer-tabpanel" data-action="click->tab#switch">
+    <button role="tab" id="explorer-tab" aria-controls="explorer-tabpanel" data-action="click->tab#switch" aria-current>
       <span class="material-icons">science</span>
       Explorer
     </button>
@@ -26,12 +26,13 @@
   </nav>
 
   <main role="region" aria-live="polite" class="bg-slate-50 h-full p-6">
-    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full"
-      data-controller="editor">
+    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full" data-controller="editor"
+      hidden>
       <textarea data-editor-target="textarea" class="font-mono w-full h-full resize-none"></textarea>
     </section>
-    <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" hidden>
-      <h1>Explorer</h1>
+    <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" class="h-full"
+      data-controller="graph">
+      <div class="w-full h-full" data-graph-target="container"></div>
     </section>
     <section role="tabpanel" id="help-tabpanel" aria-labelledby="help-tab" hidden>
       <h1>Help</h1>
