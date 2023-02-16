@@ -17,11 +17,14 @@ jobs:
           node-version: 18
           cache: "yarn"
       - run: yarn install
-      - run: yarn docs
-      - run: touch docs/.nojekyll
+      # - run: yarn docs
+      # - run: touch docs/.nojekyll
+      - run: yarn web:build
+      - run: touch dist/web/.nojekyll
 
       - uses: actions/upload-pages-artifact@v1
-        with: { path: docs/ }
+        # with: { path: docs/ }
+        with: { path: dist/web }
 
   deploy:
     needs: build
