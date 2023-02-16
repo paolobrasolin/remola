@@ -19,7 +19,7 @@ jobs:
       - run: yarn install
       # - run: yarn docs
       # - run: touch docs/.nojekyll
-      - run: yarn web:build
+      - run: yarn web:build --base=/remola/
       - run: touch dist/web/.nojekyll
 
       - uses: actions/upload-pages-artifact@v1
