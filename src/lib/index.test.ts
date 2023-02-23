@@ -5,6 +5,9 @@ import {
   listCompositionOffsets,
   Sig,
   sigFromIdcs,
+  Grammar,
+  listTypesInGrammar,
+  enumerateTypesInGrammar,
 } from "./index";
 
 describe("indicesToDomain", () => {
@@ -140,3 +143,48 @@ test("explore", () => {
     ])
   );
 });
+
+test("listTypesInGrammar", () => {
+  const grammar: Grammar = {
+    "0": { dom: [], cod: ["A"] },
+    "(": { dom: ["A"], cod: ["B", "A"] },
+    ")": { dom: ["B", "A"], cod: ["A"] },
+    "1": { dom: ["A"], cod: [] },
+  };
+  expect(listTypesInGrammar(grammar)).toStrictEqual(new Set(["A", "B"]));
+});
+
+test("enumerateTypesInGrammar", () => {
+  const grammar: Grammar = {
+    "0": { dom: [], cod: ["A"] },
+    "(": { dom: ["A"], cod: ["B", "A"] },
+    ")": { dom: ["B", "A"], cod: ["A"] },
+    "1": { dom: ["A"], cod: [] },
+  };
+  expect(enumerateTypesInGrammar(grammar)).toStrictEqual(
+    new Map([
+      ["A", 0b01n],
+      ["B", 0b10n],
+    ])
+  );
+});
+
+// test("listGeneratorsInGrammar", () => {
+//   const grammar: Grammar = {
+//     "0": { dom: [], cod: ["A"] },
+//     "(": { dom: ["A"], cod: ["B", "A"] },
+//     ")": { dom: ["B", "A"], cod: ["A"] },
+//     "1": { dom: ["A"], cod: [] },
+//   };
+//   const result = listGeneratorsInGrammar(grammar);
+//   const expected = [
+//     sigFromIdcs([], [0b01n], 2n),
+//     sigFromIdcs([0b01n], [0b10n, 0b01n], 2n),
+//     sigFromIdcs([0b10n, 0b01n], [0b01n], 2n),
+//     sigFromIdcs([0b01n], [], 2n),
+//   ];
+
+//   console.log(result);
+//   console.log(expected);
+//   expect(result).toStrictEqual(expected);
+// });
