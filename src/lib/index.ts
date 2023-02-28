@@ -1,10 +1,15 @@
-export const greet = (name: string): string => `Hello ${name}!`;
-
 export type Sig = bigint & { arity: bigint };
 
 interface Signature {
   dom: Sig;
   cod: Sig;
+}
+
+interface Generator {
+  arity: bigint;
+  domain: bigint;
+  coarity: bigint;
+  codomain: bigint;
 }
 
 export function indicesToDomain(indices: bigint[], bits: bigint): Sig {
@@ -22,6 +27,19 @@ export function sigFromIdcs(
   return {
     dom: indicesToDomain(domIdcs, bits),
     cod: indicesToDomain(codIdcs, bits),
+  };
+}
+
+export function indicesToGenerator(
+  domIdcs: bigint[],
+  codIdcs: bigint[],
+  bits: bigint
+): Generator {
+  return {
+    arity: BigInt(domIdcs.length),
+    domain: indicesToDomain(domIdcs, bits).valueOf(),
+    coarity: BigInt(codIdcs.length),
+    codomain: indicesToDomain(codIdcs, bits).valueOf(),
   };
 }
 
@@ -96,38 +114,4 @@ export function explore(
     generators,
     bits
   );
-}
-
-export type Grammar = {
-  [key: string]: {
-    dom: string[];
-    cod: string[];
-  };
-};
-
-export function listTypesInGrammar(grammar: Grammar): Set<string> {
-  const types = new Set<string>();
-  Object.values(grammar).forEach(({ dom, cod }) => {
-    dom.forEach((type) => types.add(type));
-    cod.forEach((type) => types.add(type));
-  });
-  return types;
-}
-
-export function enumerateTypesInGrammar(grammar: Grammar): Map<string, bigint> {
-  const types = new Map<string, bigint>();
-  [...listTypesInGrammar(grammar)].forEach((type, index) => {
-    types.set(type, BigInt(index + 1));
-  });
-  return types;
-}
-
-export function listGeneratorsInGrammar(grammar: Grammar): Signature[] {
-  const types = enumerateTypesInGrammar(grammar);
-  const bits = 2n;
-  return Object.values(grammar).map(({ dom, cod }) => {
-    const d = dom.map((type) => types.get(type)!);
-    const c = cod.map((type) => types.get(type)!);
-    return sigFromIdcs(d, c, bits);
-  });
 }
