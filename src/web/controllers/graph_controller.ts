@@ -1,7 +1,8 @@
 import cytoscape, { Stylesheet } from "cytoscape";
-import { sigFromIdcs, Sig, explore } from "../../lib/index";
+import { explore } from "../../lib/generation";
 
 import { Controller } from "@hotwired/stimulus";
+import { Composable, indicesToGenerator } from "../../lib/encoding";
 
 const STYLE: Stylesheet[] = [
   {
@@ -55,12 +56,12 @@ export default class extends Controller {
   connect() {
     const bits = 2n;
     const balParLangGenerators = [
-      sigFromIdcs([], [0b01n], bits),
-      sigFromIdcs([0b01n], [0b10n, 0b01n], bits),
-      sigFromIdcs([0b10n, 0b01n], [0b01n], bits),
-      sigFromIdcs([0b01n], [], bits),
+      indicesToGenerator([], [0b01n], bits),
+      indicesToGenerator([0b01n], [0b10n, 0b01n], bits),
+      indicesToGenerator([0b10n, 0b01n], [0b01n], bits),
+      indicesToGenerator([0b01n], [], bits),
     ];
-    const start: Sig[] = [sigFromIdcs([], [], bits).cod];
+    const start: Composable[] = [indicesToGenerator([], [], bits)];
     const store = new Map<bigint, Set<bigint>>();
     explore(start, store, 6n, balParLangGenerators, bits);
 
