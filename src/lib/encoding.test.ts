@@ -1,10 +1,30 @@
 import {
   encodeTypesInGrammar,
-  HumanGrammar,
   humanToMachineGrammar,
+  indicesToSignature,
   listTypesInGrammar,
+  HumanGrammar,
   MachineGrammar,
-} from "./grammar";
+} from "./encoding";
+
+describe("indicesToSignature", () => {
+  test.each([
+    { bits: 1, idcs: [], exp: 0b0 },
+    { bits: 1, idcs: [1], exp: 0b1 },
+    { bits: 1, idcs: [1, 1], exp: 0b11 },
+    { bits: 1, idcs: [1, 1, 1], exp: 0b111 },
+    { bits: 2, idcs: [], exp: 0b00 },
+    { bits: 2, idcs: [1], exp: 0b01 },
+    { bits: 2, idcs: [2], exp: 0b10 },
+    { bits: 2, idcs: [1, 1], exp: 0b0101 },
+    { bits: 2, idcs: [1, 2], exp: 0b1001 },
+    { bits: 2, idcs: [2, 1], exp: 0b0110 },
+    { bits: 2, idcs: [2, 2], exp: 0b1010 },
+  ])("$bits bits: $idcs => $exp", ({ bits, idcs, exp }) => {
+    const res = indicesToSignature(idcs.map(BigInt), BigInt(bits));
+    expect(res).toBe(BigInt(exp));
+  });
+});
 
 test("listTypesInGrammar", () => {
   const grammar: HumanGrammar = {

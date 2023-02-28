@@ -1,15 +1,16 @@
-import { indicesToGenerator } from ".";
+export type Arity = bigint;
+export type Signature = bigint;
+export type BitSize = bigint;
 
-type Arity = bigint;
-type Signature = bigint;
-type BitSize = bigint;
-
-interface Generator {
+export interface Composable {
   arity: Arity;
   domain: Signature;
   coarity: Arity;
   codomain: Signature;
 }
+
+// NOTE: that's a BAD name, overriding existing stuff
+export type Generator = Composable;
 
 export type HumanGrammar = {
   [key: string]: {
@@ -23,6 +24,23 @@ export type MachineGrammar = {
   alphabet: Map<symbol, Signature>;
   generators: Map<symbol, Generator>;
 };
+
+export function indicesToSignature(indices: bigint[], bits: bigint): Signature {
+  return indices.reduce((p, c, i) => p + (c << (BigInt(i) * bits)), 0n);
+}
+
+export function indicesToGenerator(
+  domIndices: bigint[],
+  codIndices: bigint[],
+  bits: bigint
+): Generator {
+  return {
+    arity: BigInt(domIndices.length),
+    domain: indicesToSignature(domIndices, bits),
+    coarity: BigInt(codIndices.length),
+    codomain: indicesToSignature(codIndices, bits),
+  };
+}
 
 export function humanToMachineGrammar(grammar: HumanGrammar): MachineGrammar {
   const alphabet = encodeTypesInGrammar(grammar);

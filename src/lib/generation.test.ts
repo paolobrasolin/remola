@@ -1,31 +1,9 @@
+import { Composable, indicesToGenerator } from "./encoding";
 import {
   listCompositions,
   explore,
-  indicesToDomain,
   listCompositionOffsets,
-  Sig,
-  sigFromIdcs,
-} from "./index";
-
-describe("indicesToDomain", () => {
-  test.each([
-    { bits: 1, idcs: [], exp: 0b0 },
-    { bits: 1, idcs: [1], exp: 0b1 },
-    { bits: 1, idcs: [1, 1], exp: 0b11 },
-    { bits: 1, idcs: [1, 1, 1], exp: 0b111 },
-    { bits: 2, idcs: [], exp: 0b00 },
-    { bits: 2, idcs: [1], exp: 0b01 },
-    { bits: 2, idcs: [2], exp: 0b10 },
-    { bits: 2, idcs: [1, 1], exp: 0b0101 },
-    { bits: 2, idcs: [1, 2], exp: 0b1001 },
-    { bits: 2, idcs: [2, 1], exp: 0b0110 },
-    { bits: 2, idcs: [2, 2], exp: 0b1010 },
-  ])("$bits bits: $idcs => $exp", ({ bits, idcs, exp }) => {
-    const res = indicesToDomain(idcs.map(BigInt), BigInt(bits));
-    expect(res.valueOf()).toBe(BigInt(exp));
-    expect(res.arity).toBe(BigInt(idcs.length));
-  });
-});
+} from "./generation";
 
 describe("listCompositionOffsets", () => {
   test.each([
@@ -47,8 +25,8 @@ describe("listCompositionOffsets", () => {
     { bits: 2, cod: [3, 3, 1, 2], dom: [1, 2], exp: [2] },
   ])("$bits bits: $cod accepts $dom at $exp", ({ bits, cod, dom, exp }) => {
     const b = BigInt(bits);
-    const lho = indicesToDomain(cod.map(BigInt), b);
-    const rho = indicesToDomain(dom.map(BigInt), b);
+    const lho = indicesToGenerator([], cod.map(BigInt), b);
+    const rho = indicesToGenerator(dom.map(BigInt), [], b);
     const res = listCompositionOffsets(lho, rho, b);
     expect(res).toStrictEqual(exp.map(BigInt));
   });
@@ -106,12 +84,20 @@ describe("listCompositions", () => {
     "$bits bits: $lho.dom>$lho.cod composes with $rho.dom>$rho.cod in $exp.length ways",
     ({ bits, lho, rho, exp }) => {
       const bN = BigInt(bits);
-      const lhoN = sigFromIdcs(lho.dom.map(BigInt), lho.cod.map(BigInt), bN);
-      const rhoN = sigFromIdcs(rho.dom.map(BigInt), rho.cod.map(BigInt), bN);
+      const lhoN = indicesToGenerator(
+        lho.dom.map(BigInt),
+        lho.cod.map(BigInt),
+        bN
+      );
+      const rhoN = indicesToGenerator(
+        rho.dom.map(BigInt),
+        rho.cod.map(BigInt),
+        bN
+      );
       const resN = listCompositions(lhoN, rhoN, bN);
       const expN = exp.map(([offset, { dom, cod }]) => [
         BigInt(offset),
-        sigFromIdcs(dom.map(BigInt), cod.map(BigInt), bN),
+        indicesToGenerator(dom.map(BigInt), cod.map(BigInt), bN),
       ]);
       expect(resN).toStrictEqual(expN);
     }
@@ -121,12 +107,12 @@ describe("listCompositions", () => {
 test("explore", () => {
   const bits = 2n;
   const balParLangGenerators = [
-    sigFromIdcs([], [0b01n], bits),
-    sigFromIdcs([0b01n], [0b10n, 0b01n], bits),
-    sigFromIdcs([0b10n, 0b01n], [0b01n], bits),
-    sigFromIdcs([0b01n], [], bits),
+    indicesToGenerator([], [0b01n], bits),
+    indicesToGenerator([0b01n], [0b10n, 0b01n], bits),
+    indicesToGenerator([0b10n, 0b01n], [0b01n], bits),
+    indicesToGenerator([0b01n], [], bits),
   ];
-  const start: Sig[] = [sigFromIdcs([], [], bits).cod];
+  const start: Composable[] = [indicesToGenerator([], [], bits)];
   const store = new Map<bigint, Set<bigint>>();
   expect(store).toStrictEqual(new Map());
   explore(start, store, 4n, balParLangGenerators, bits);
