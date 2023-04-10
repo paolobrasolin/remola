@@ -11,7 +11,11 @@
 <body class="flex flex-col w-screen h-screen overflow-hidden" data-controller="tab">
 
   <nav role="tablist">
-    <button role="tab" id="grammar-tab" aria-controls="grammar-tabpanel" data-action="click->tab#switch" aria-current>
+    <button role="tab" id="diagram-tab" aria-controls="diagram-tabpanel" data-action="click->tab#switch" aria-current>
+      <span class="material-icons">schema</span>
+      Diagram
+    </button>
+    <button role="tab" id="grammar-tab" aria-controls="grammar-tabpanel" data-action="click->tab#switch">
       <span class="material-icons">code</span>
       Grammar
     </button>
@@ -26,8 +30,12 @@
   </nav>
 
   <main role="region" aria-live="polite" class="bg-slate-50 h-full p-6">
-    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full"
-      data-controller="editor">
+    <section role="tabpanel" id="diagram-tabpanel" aria-labelledby="diagram-tab" class="h-full"
+      data-controller="diagram">
+      <div class="w-full h-full" data-diagram-target="container"></div>
+    </section>
+    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full" data-controller="editor"
+      hidden>
       <div class="w-full h-full" data-editor-target="container"></div>
     </section>
     <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" class="h-full"
