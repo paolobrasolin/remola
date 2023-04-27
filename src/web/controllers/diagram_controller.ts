@@ -13,8 +13,8 @@ export default class extends Controller {
 
     const paper = new joint.dia.Paper({
       el: this.containerTarget,
-      width: 600,
-      height: 600,
+      // width: 600,
+      // height: 600,
       model: graph,
       background: {
         color: "antiquewhite",
@@ -165,11 +165,11 @@ export default class extends Controller {
       ],
     });
 
-    paper.fitToContent({
-      useModelGeometry: true,
-      padding: 100,
-      allowNewOrigin: "any",
-    });
+    // paper.fitToContent({
+    //   useModelGeometry: true,
+    //   padding: 100,
+    //   allowNewOrigin: "any",
+    // });
   }
 
   disconnect() {

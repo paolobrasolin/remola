@@ -32,4 +32,10 @@
   [role=tab][aria-current]{
     @apply text-purple-600 border-b-2 border-purple-600;
   }
+
+  main {
+    @apply grid;
+    grid-template-columns: repeat(2, 50%);
+    grid-template-rows: repeat(2, 50%)
+  }
 }
