@@ -13,14 +13,14 @@ export default class extends Controller {
 
     const paper = new joint.dia.Paper({
       el: this.containerTarget,
-      // width: 600,
-      // height: 600,
+      width: "100%",
+      height: "100%",
       model: graph,
       background: {
-        color: "antiquewhite",
+        color: "rgba(240, 255, 250, 0.5)",
       },
       cellViewNamespace: namespace,
-      gridSize: 1,
+      gridSize: 10,
       drawGrid: true,
       interactive: {
         // links
