@@ -30,6 +30,26 @@ const SCHEMA = {
   },
 };
 
+const VALIDATION_PENDING_MARKER: editor.IMarkerData = {
+  severity: 2,
+  message: "Code is not yet validated",
+  startColumn: 0,
+  startLineNumber: 0,
+  endColumn: Infinity,
+  endLineNumber: Infinity,
+};
+
+languages.json.jsonDefaults.setDiagnosticsOptions({
+  validate: true,
+  schemas: [
+    {
+      uri: "https://paolobrasolin.github.io/remola/generators_schema.json",
+      fileMatch: ["*"],
+      schema: SCHEMA,
+    },
+  ],
+});
+
 export default class extends Controller {
   static targets = ["container"];
   declare readonly containerTarget: HTMLDivElement;
@@ -42,16 +62,31 @@ export default class extends Controller {
       language: "json",
     });
 
-    languages.json.jsonDefaults.setDiagnosticsOptions({
-      schemas: [
-        {
-          uri: "https://paolobrasolin.github.io/remola/generators_schema.json",
-          fileMatch: ["*"],
-          schema: SCHEMA,
-        },
-      ],
+    this.editor.onDidChangeModelContent(() => {
+      const model = this.editor.getModel();
+      if (!model) return;
+      this.appendValidationPendingMarker(model);
+    });
+
+    editor.onDidChangeMarkers(() => {
+      // editor.getModelMarkers({ owner: "json" }).length > 0;
     });
   }
 
-  disconnect() {}
+  disconnect() {
+    //
+  }
+
+  // NOTE: this is a kludge to force a call to onDidChangeMarkers after every onDidChangeModelContent, effectively giving us an onValidationCompleted event
+  appendValidationPendingMarker(model: editor.ITextModel) {
+    const currentMarkers: editor.IMarkerData[] = editor.getModelMarkers({
+      resource: model.uri,
+      owner: "json",
+    });
+
+    editor.setModelMarkers(model, "json", [
+      ...currentMarkers,
+      VALIDATION_PENDING_MARKER,
+    ]);
+  }
 }
