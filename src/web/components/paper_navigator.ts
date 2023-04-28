@@ -3,10 +3,10 @@ import * as joint from "jointjs";
 type GestureState =
   | undefined
   | {
+      touches: number;
       client: {
         focus: joint.g.Point;
         width: number;
-        // angle: number;
       };
       paper: {
         focus: joint.g.Point;
@@ -27,7 +27,7 @@ export default class {
   }
 
   bindEvents() {
-    this.paper.on("blank:pointerup", ({ originalEvent }) => {
+    this.paper.on("blank:pointerdown", ({ originalEvent }) => {
       if (originalEvent instanceof TouchEvent) {
         this.initialGestureState = this.detectGesture(originalEvent.touches);
         this.currentGestureState = undefined;
@@ -36,12 +36,18 @@ export default class {
     });
     this.paper.on("blank:pointermove", ({ originalEvent }) => {
       if (originalEvent instanceof TouchEvent) {
-        this.currentGestureState = this.detectGesture(originalEvent.touches);
-        this.applyGestureDelta();
+        const newg = this.detectGesture(originalEvent.touches);
+        if (this.initialGestureState?.touches === newg?.touches) {
+          this.currentGestureState = newg;
+          this.applyGestureDelta();
+        } else {
+          this.initialGestureState = this.detectGesture(originalEvent.touches);
+          this.currentGestureState = undefined;
+        }
       }
       // if (originalEvent instanceof MouseEvent) console.log(originalEvent);
     });
-    this.paper.on("blank:pointerdown", ({ originalEvent }) => {
+    this.paper.on("blank:pointerup", ({ originalEvent }) => {
       if (originalEvent instanceof TouchEvent) {
         this.initialGestureState = this.detectGesture(originalEvent.touches);
         this.currentGestureState = undefined;
@@ -100,6 +106,7 @@ export default class {
     const matrix = this.paper.matrix();
 
     return {
+      touches: touches.length,
       client: client,
       paper: {
         focus: this.paper.clientToLocalPoint(client.focus),
