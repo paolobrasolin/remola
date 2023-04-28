@@ -36,12 +36,14 @@ export default class {
     });
     this.paper.on("blank:pointermove", ({ originalEvent }) => {
       if (originalEvent instanceof TouchEvent) {
-        const newg = this.detectGesture(originalEvent.touches);
-        if (this.initialGestureState?.touches === newg?.touches) {
-          this.currentGestureState = newg;
+        this.currentGestureState = this.detectGesture(originalEvent.touches);
+        if (
+          this.initialGestureState?.touches ===
+          this.currentGestureState?.touches
+        ) {
           this.applyGestureDelta();
         } else {
-          this.initialGestureState = this.detectGesture(originalEvent.touches);
+          this.initialGestureState = this.currentGestureState;
           this.currentGestureState = undefined;
         }
       }
