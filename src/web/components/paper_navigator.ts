@@ -149,30 +149,4 @@ export default class {
       },
     };
   }
-
-  // bindPaperDrag(paper: joint.dia.Paper) {
-  //   paper.on("blank:pointerdown", (evt) => {
-  //     console.log(evt.touches);
-  //     this.touchTracker = {
-  //       mouse: { x: evt.clientX, y: evt.clientY },
-  //       paper: paper.translate(),
-  //     };
-  //   });
-
-  //   paper.on(
-  //     "blank:pointermove",
-  //     (evt: { clientX: number; clientY: number }) => {
-  //       if (!this.touchTracker) return;
-  //       // TODO: account for paper.scale());
-  //       paper.translate(
-  //         this.touchTracker.paper.tx +
-  //           (evt.clientX - this.touchTracker.mouse.x),
-  //         this.touchTracker.paper.ty + (evt.clientY - this.touchTracker.mouse.y)
-  //       );
-  //     }
-  //   );
-
-  //   paper.on("blank:pointerup", () => {
-  //     this.touchTracker = undefined;
-  //   });
 }
