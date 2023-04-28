@@ -29,14 +29,21 @@ export default class {
   bindEvents() {
     this.paper.on("blank:pointerdown", ({ originalEvent }) => {
       if (originalEvent instanceof TouchEvent) {
-        this.initialGestureState = this.detectGesture(originalEvent.touches);
+        this.initialGestureState = this.detectTouchGesture(
+          originalEvent.touches
+        );
         this.currentGestureState = undefined;
       }
-      // if (originalEvent instanceof MouseEvent) console.log(originalEvent);
+      if (originalEvent instanceof MouseEvent) {
+        this.initialGestureState = this.detectMouseGesture(originalEvent);
+        this.currentGestureState = undefined;
+      }
     });
     this.paper.on("blank:pointermove", ({ originalEvent }) => {
       if (originalEvent instanceof TouchEvent) {
-        this.currentGestureState = this.detectGesture(originalEvent.touches);
+        this.currentGestureState = this.detectTouchGesture(
+          originalEvent.touches
+        );
         if (
           this.initialGestureState?.touches ===
           this.currentGestureState?.touches
@@ -47,14 +54,22 @@ export default class {
           this.currentGestureState = undefined;
         }
       }
-      // if (originalEvent instanceof MouseEvent) console.log(originalEvent);
+      if (originalEvent instanceof MouseEvent) {
+        this.currentGestureState = this.detectMouseGesture(originalEvent);
+        this.applyGestureDelta();
+      }
     });
     this.paper.on("blank:pointerup", ({ originalEvent }) => {
       if (originalEvent instanceof TouchEvent) {
-        this.initialGestureState = this.detectGesture(originalEvent.touches);
+        this.initialGestureState = this.detectTouchGesture(
+          originalEvent.touches
+        );
         this.currentGestureState = undefined;
       }
-      // if (originalEvent instanceof MouseEvent) console.log(originalEvent);
+      if (originalEvent instanceof MouseEvent) {
+        this.initialGestureState = this.detectMouseGesture(originalEvent);
+        this.currentGestureState = undefined;
+      }
     });
   }
 
@@ -101,7 +116,7 @@ export default class {
     } else return;
   }
 
-  detectGesture(touches: TouchList) {
+  detectTouchGesture(touches: TouchList) {
     const client = this.touchesToGestureClientState(touches);
     if (!client) return;
 
@@ -112,6 +127,23 @@ export default class {
       client: client,
       paper: {
         focus: this.paper.clientToLocalPoint(client.focus),
+        scale: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b), // NOTE: assumes uniform scaling
+        matrix,
+      },
+    };
+  }
+
+  detectMouseGesture(event: MouseEvent) {
+    const focus = new joint.g.Point(event.clientX, event.clientY);
+    const matrix = this.paper.matrix();
+    return {
+      touches: 1,
+      client: {
+        focus: focus,
+        width: 1,
+      },
+      paper: {
+        focus: this.paper.clientToLocalPoint(focus),
         scale: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b), // NOTE: assumes uniform scaling
         matrix,
       },
