@@ -29,20 +29,18 @@
     </button>
   </nav>
 
-  <main role="region" aria-live="polite" class="bg-slate-50 h-full">
-    <section role="tabpanel" id="diagram-tabpanel" aria-labelledby="diagram-tab" class="h-full"
-      data-controller="diagram">
+  <main role="region" aria-live="polite" class="bg-slate-50 h-full" data-controller="main editor graph diagram"
+    data-action="editor:grammarchanged->main#logEvent">
+    <section role="tabpanel" id="diagram-tabpanel" aria-labelledby="diagram-tab" class="h-full">
       <div class="w-full h-full" data-diagram-target="container"></div>
     </section>
-    <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" class="h-full"
-      data-controller="graph">
+    <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" class="h-full">
       <div class="w-full h-full" data-graph-target="container"></div>
     </section>
     <section role="tabpanel" id="list-tabpanel" aria-labelledby="list-tab">
       <div class="w-full h-full"></div>
     </section>
-    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full"
-      data-controller="editor">
+    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full">
       <div class="w-full h-full" data-editor-target="container"></div>
     </section>
   </main>

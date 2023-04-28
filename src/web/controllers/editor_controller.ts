@@ -69,7 +69,10 @@ export default class extends Controller {
     });
 
     editor.onDidChangeMarkers(() => {
-      // editor.getModelMarkers({ owner: "json" }).length > 0;
+      const invalid = editor.getModelMarkers({ owner: "json" }).length > 0;
+      if (invalid) return;
+      const grammar = JSON.parse(this.editor.getValue());
+      this.dispatch("grammarchanged", { detail: { grammar } });
     });
   }
 
