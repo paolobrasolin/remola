@@ -1,0 +1,137 @@
+import * as joint from "jointjs";
+
+type GestureState =
+  | undefined
+  | {
+      client: {
+        focus: joint.g.Point;
+        width: number;
+        // angle: number;
+      };
+      paper: {
+        focus: joint.g.Point;
+        scale: number;
+        matrix: SVGMatrix;
+      };
+    };
+
+export default class {
+  paper: joint.dia.Paper;
+
+  initialGestureState: GestureState;
+  currentGestureState: GestureState;
+
+  constructor(paper: joint.dia.Paper) {
+    this.paper = paper;
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    this.paper.on("blank:pointerup", ({ originalEvent }) => {
+      if (originalEvent instanceof TouchEvent) {
+        this.initialGestureState = this.detectGesture(originalEvent.touches);
+        this.currentGestureState = undefined;
+      }
+      // if (originalEvent instanceof MouseEvent) console.log(originalEvent);
+    });
+    this.paper.on("blank:pointermove", ({ originalEvent }) => {
+      if (originalEvent instanceof TouchEvent) {
+        this.currentGestureState = this.detectGesture(originalEvent.touches);
+        this.applyGestureDelta();
+      }
+      // if (originalEvent instanceof MouseEvent) console.log(originalEvent);
+    });
+    this.paper.on("blank:pointerdown", ({ originalEvent }) => {
+      if (originalEvent instanceof TouchEvent) {
+        this.initialGestureState = this.detectGesture(originalEvent.touches);
+        this.currentGestureState = undefined;
+      }
+      // if (originalEvent instanceof MouseEvent) console.log(originalEvent);
+    });
+  }
+
+  applyGestureDelta() {
+    if (!this.initialGestureState) return;
+    if (!this.currentGestureState) return;
+
+    const initialState = this.initialGestureState.client;
+    const initialPaper = this.initialGestureState.paper;
+
+    const currentState = this.currentGestureState.client;
+
+    const scale = currentState.width / initialState.width;
+    const shift = currentState.focus.difference(initialState.focus);
+
+    let matrix = initialPaper.matrix;
+
+    if (scale !== 1)
+      matrix = matrix
+        .translate(initialPaper.focus.x, initialPaper.focus.y)
+        .scale(scale)
+        .translate(-initialPaper.focus.x, -initialPaper.focus.y);
+
+    matrix = matrix.translate(
+      shift.x / (scale * initialPaper.scale),
+      shift.y / (scale * initialPaper.scale)
+    );
+    this.paper.matrix(matrix);
+  }
+
+  touchesToGestureClientState(touches: TouchList) {
+    if (touches.length === 1) {
+      const fstTouch = touches.item(0)!;
+      const focus = new joint.g.Point(fstTouch.clientX, fstTouch.clientY);
+      return { focus, width: 1 };
+    } else if (touches.length === 2) {
+      const fstTouch = touches.item(0)!;
+      const sndTouch = touches.item(1)!;
+      const fstPoint = new joint.g.Point(fstTouch.clientX, fstTouch.clientY);
+      const sndPoint = new joint.g.Point(sndTouch.clientX, sndTouch.clientY);
+      const focus = fstPoint.lerp(sndPoint, 0.5);
+      const width = fstPoint.distance(sndPoint);
+      return { focus, width };
+    } else return;
+  }
+
+  detectGesture(touches: TouchList) {
+    const client = this.touchesToGestureClientState(touches);
+    if (!client) return;
+
+    const matrix = this.paper.matrix();
+
+    return {
+      client: client,
+      paper: {
+        focus: this.paper.clientToLocalPoint(client.focus),
+        scale: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b), // NOTE: assumes uniform scaling
+        matrix,
+      },
+    };
+  }
+
+  // bindPaperDrag(paper: joint.dia.Paper) {
+  //   paper.on("blank:pointerdown", (evt) => {
+  //     console.log(evt.touches);
+  //     this.touchTracker = {
+  //       mouse: { x: evt.clientX, y: evt.clientY },
+  //       paper: paper.translate(),
+  //     };
+  //   });
+
+  //   paper.on(
+  //     "blank:pointermove",
+  //     (evt: { clientX: number; clientY: number }) => {
+  //       if (!this.touchTracker) return;
+  //       // TODO: account for paper.scale());
+  //       paper.translate(
+  //         this.touchTracker.paper.tx +
+  //           (evt.clientX - this.touchTracker.mouse.x),
+  //         this.touchTracker.paper.ty + (evt.clientY - this.touchTracker.mouse.y)
+  //       );
+  //     }
+  //   );
+
+  //   paper.on("blank:pointerup", () => {
+  //     this.touchTracker = undefined;
+  //   });
+}
