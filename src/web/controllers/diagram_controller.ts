@@ -171,11 +171,10 @@ export default class extends Controller {
 
     new PaperNavigator(paper);
 
-    // paper.fitToContent({
-    //   useModelGeometry: true,
-    //   padding: 100,
-    //   allowNewOrigin: "any",
-    // });
+    paper.transformToFitContent({
+      useModelGeometry: true,
+      padding: 10,
+    });
   }
 
   disconnect() {
