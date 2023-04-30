@@ -29,8 +29,11 @@
     </button>
   </nav>
 
-  <main role="region" aria-live="polite" class="bg-slate-50 h-full" data-controller="main editor graph diagram"
-    data-action="editor:grammarchanged->main#logEvent">
+  <main role="region" aria-live="polite" class="bg-slate-50 h-full" data-controller="main editor list graph diagram"
+    data-action="
+editor:grammarChanged->main#ingestGrammar
+main:optionsChanged->list#ingestOptions
+    ">
     <section role="tabpanel" id="diagram-tabpanel" aria-labelledby="diagram-tab" class="h-full">
       <div class="w-full h-full" data-diagram-target="container"></div>
     </section>
@@ -38,7 +41,7 @@
       <div class="w-full h-full" data-graph-target="container"></div>
     </section>
     <section role="tabpanel" id="list-tabpanel" aria-labelledby="list-tab">
-      <div class="w-full h-full"></div>
+      <select multiple class="w-full h-full" data-list-target="container"></select>
     </section>
     <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full">
       <div class="w-full h-full" data-editor-target="container"></div>

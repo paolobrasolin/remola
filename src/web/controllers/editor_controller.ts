@@ -58,7 +58,7 @@ export default class extends Controller {
 
   connect() {
     this.editor = editor.create(this.containerTarget, {
-      value: DEFAULT,
+      // value: DEFAULT,
       language: "json",
     });
 
@@ -72,8 +72,10 @@ export default class extends Controller {
       const invalid = editor.getModelMarkers({ owner: "json" }).length > 0;
       if (invalid) return;
       const grammar = JSON.parse(this.editor.getValue());
-      this.dispatch("grammarchanged", { detail: { grammar } });
+      this.dispatch("grammarChanged", { detail: { grammar } });
     });
+
+    this.editor.setValue(DEFAULT);
   }
 
   disconnect() {
