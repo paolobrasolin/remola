@@ -2,10 +2,10 @@ import { Controller } from "@hotwired/stimulus";
 import { editor, languages } from "monaco-editor";
 
 const DEFAULT = `{
-  "0": { "dom": [], "cod": ["A"]},
+  "0": { "dom": [], "cod": ["A", "X"]},
   "(": { "dom": ["A"], "cod": ["B", "A"]},
   ")": { "dom": ["B", "A"], "cod": ["A"]},
-  "1": { "dom": ["A"], "cod": []}
+  "1": { "dom": ["A", "X"], "cod": []}
 }`;
 
 const SCHEMA = {

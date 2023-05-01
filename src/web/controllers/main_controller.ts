@@ -10,6 +10,7 @@ import {
 import { explore, exploreWithEdges } from "../../lib/generation";
 
 export default class extends Controller {
+  humanGrammar!: HumanGrammar;
   machineGrammar!: MachineGrammar;
   graphStore!: Map<bigint, Map<Signature, [bigint, symbol, Composable]>>;
   diagramsStore!: [Signature, [bigint, symbol, Composable]][][];
@@ -17,6 +18,7 @@ export default class extends Controller {
   ingestGrammar({
     detail: { grammar },
   }: CustomEvent<{ grammar: HumanGrammar }>) {
+    this.humanGrammar = grammar;
     this.machineGrammar = humanToMachineGrammar(grammar);
     this.graphStore = new Map();
     this.diagramsStore = [];
@@ -24,7 +26,7 @@ export default class extends Controller {
     exploreWithEdges(
       [indicesToGenerator([], [], this.machineGrammar.bits)], // seeding w/ empty signature
       this.graphStore,
-      4n, //up to depth 4
+      6n, //up to depth 4
       [...this.machineGrammar.generators.values()],
       this.machineGrammar.bits
     );
@@ -40,7 +42,7 @@ export default class extends Controller {
             .map((d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[parseInt(d)]);
           return `${Symbol.keyFor(name)}${sup}`;
         })
-        .join(" ");
+        .join(" ; ");
       return { value: i.toString(), label: label };
     });
     this.dispatch("optionsChanged", { detail: { options } });
@@ -96,6 +98,11 @@ export default class extends Controller {
   ingestSelection({
     detail: { selection },
   }: CustomEvent<{ selection: string }>) {
-    console.log(this.diagramsStore[parseInt(selection)]);
+    const diagram = this.diagramsStore[parseInt(selection)];
+    const humanGrammar = this.humanGrammar;
+    const machineGrammar = this.machineGrammar;
+    this.dispatch("diagramChanged", {
+      detail: { diagram, humanGrammar, machineGrammar },
+    });
   }
 }

@@ -3,23 +3,30 @@ import { Controller } from "@hotwired/stimulus";
 import * as joint from "jointjs";
 
 import PaperNavigator from "../components/paper_navigator";
+import {
+  Composable,
+  HumanGrammar,
+  MachineGrammar,
+  Signature,
+} from "../../lib/encoding";
 
 export default class extends Controller {
   static targets = ["container"];
   declare readonly containerTarget: HTMLDivElement;
 
+  graph!: joint.dia.Graph;
   paper!: joint.dia.Paper;
 
   connect() {
     const namespace = joint.shapes;
 
-    const graph = new joint.dia.Graph({}, { cellNamespace: namespace });
+    this.graph = new joint.dia.Graph({}, { cellNamespace: namespace });
 
-    const paper = new joint.dia.Paper({
+    this.paper = new joint.dia.Paper({
       el: this.containerTarget,
       width: "100%",
       height: "100%",
-      model: graph,
+      model: this.graph,
       background: {
         color: "rgba(240, 255, 250, 0.5)",
       },
@@ -45,8 +52,8 @@ export default class extends Controller {
       defaultRouter: {
         name: "metro",
         args: {
-          step: 10,
-          padding: 10,
+          step: 1,
+          padding: 0,
           startDirections: ["right"],
           endDirections: ["left"],
           maxAllowedDirectionChange: 45,
@@ -68,18 +75,37 @@ export default class extends Controller {
               magnet: false,
             },
             ".label": {
-              text: "β",
+              text: "?",
               "ref-x": 20,
-              "ref-y": 0,
-              "font-size": 18,
-              "text-anchor": "middle",
-              "dominant-baseline": "central",
-              fill: "red",
+              "ref-y": 20,
+              "font-size": 20,
+              // "text-anchor": "middle",
+              // "dominant-baseline": "central",
+              y: "0.3em",
+              // fill: "red",
             },
             ".body": {
               "ref-width": "100%",
               "ref-height": "100%",
               stroke: "#000",
+            },
+          },
+          ports: {
+            groups: {
+              in: {
+                attrs: {
+                  ".port-label": { hidden: "true", "font-size": "xx-small" },
+                  ".port-body": { fill: "black", stroke: "#000", r: 2 },
+                },
+                label: { position: { name: "center", args: { y: 0 } } },
+              },
+              out: {
+                attrs: {
+                  ".port-label": { hidden: "true", "font-size": "xx-small" },
+                  ".port-body": { fill: "black", stroke: "#000", r: 2 },
+                },
+                label: { position: { name: "center", args: { y: 0 } } },
+              },
             },
           },
         },
@@ -116,68 +142,136 @@ export default class extends Controller {
       ),
     };
 
-    graph.fromJSON({
-      cells: [
-        {
-          type: "custom.Model",
-          inPorts: [],
-          outPorts: ["Ao"],
-          id: "0",
-          position: { x: 0, y: 0 },
-        },
-        {
-          type: "custom.Model",
-          inPorts: ["Ai"],
-          outPorts: ["Bo", "Ao", "X"],
-          id: "(",
-          position: { x: 200, y: 0 },
-        },
-        {
-          type: "custom.Model",
-          inPorts: ["Bi", "Ai"],
-          outPorts: ["Ao"],
-          id: ")",
-          position: { x: 400, y: 0 },
-        },
-        {
-          type: "custom.Model",
-          inPorts: ["Ai"],
-          outPorts: [],
-          id: "1",
-          position: { x: 600, y: 0 },
-        },
-        {
-          type: "custom.Link",
-          source: { id: "0", port: "Ao" },
-          target: { id: "(", port: "Ai" },
-        },
-        {
-          type: "custom.Link",
-          source: { id: "(", port: "Ao" },
-          target: { id: ")", port: "Ai" },
-        },
-        {
-          type: "custom.Link",
-          source: { id: "(", port: "Bo" },
-          target: { id: ")", port: "Bi" },
-        },
-        {
-          type: "custom.Link",
-          source: { id: ")", port: "Ao" },
-          target: { id: "1", port: "Ai" },
-        },
-      ],
-    });
+    new PaperNavigator(this.paper);
 
-    new PaperNavigator(paper);
+    // this.graph.fromJSON({
+    //   cells: [
+    //     {
+    //       type: "custom.Model",
+    //       inPorts: [],
+    //       outPorts: ["Ao"],
+    //       id: "0",
+    //       position: { x: 0, y: 0 },
+    //     },
+    //     {
+    //       type: "custom.Model",
+    //       inPorts: ["Ai"],
+    //       outPorts: ["Bo", "Ao", "X"],
+    //       id: "(",
+    //       position: { x: 200, y: 0 },
+    //     },
+    //     {
+    //       type: "custom.Model",
+    //       inPorts: ["Bi", "Ai"],
+    //       outPorts: ["Ao"],
+    //       id: ")",
+    //       position: { x: 400, y: 0 },
+    //     },
+    //     {
+    //       type: "custom.Model",
+    //       inPorts: ["Ai"],
+    //       outPorts: [],
+    //       id: "1",
+    //       position: { x: 600, y: 0 },
+    //     },
+    //     {
+    //       type: "custom.Link",
+    //       source: { id: "0", port: "Ao" },
+    //       target: { id: "(", port: "Ai" },
+    //     },
+    //     {
+    //       type: "custom.Link",
+    //       source: { id: "(", port: "Ao" },
+    //       target: { id: ")", port: "Ai" },
+    //     },
+    //     {
+    //       type: "custom.Link",
+    //       source: { id: "(", port: "Bo" },
+    //       target: { id: ")", port: "Bi" },
+    //     },
+    //     {
+    //       type: "custom.Link",
+    //       source: { id: ")", port: "Ao" },
+    //       target: { id: "1", port: "Ai" },
+    //     },
+    //   ],
+    // });
 
-    paper.transformToFitContent({
-      useModelGeometry: true,
-      padding: 10,
-    });
+    // this.paper.transformToFitContent({
+    //   useModelGeometry: true,
+    //   padding: 10,
+    // });
   }
 
   disconnect() {
-    console.log("BYE");
+    //
+  }
+
+  ingestDiagram({
+    detail: { diagram, humanGrammar, machineGrammar },
+  }: CustomEvent<{
+    diagram: [Signature, [bigint, symbol, Composable]][];
+    humanGrammar: HumanGrammar;
+    machineGrammar: MachineGrammar;
+  }>) {
+    console.log(diagram);
+    console.log(humanGrammar);
+
+    const cells: any = [];
+    diagram.forEach(([sig, [off, lab, com]], index) => {
+      const id = index.toString();
+      const name = Symbol.keyFor(lab)!;
+      const inPorts = humanGrammar[name]["dom"].map((_, i) => `${id}.d.${i}`);
+      const outPorts = humanGrammar[name]["cod"].map((_, i) => `${id}.c.${i}`);
+      cells.push({
+        type: "custom.Model",
+        attrs: { ".label": { text: name } },
+        inPorts,
+        outPorts,
+        id: id,
+        position: { x: index * 80, y: Number(off) * 40 },
+      });
+    });
+
+    console.group("1 <= i <", diagram.length);
+    for (let i = 1; i < diagram.length; i++) {
+      console.group("i ==", i);
+      const [, [cO, cS]] = diagram[i];
+      const cC = machineGrammar.generators.get(cS)!;
+
+      console.group("0 <= j <", cC.arity);
+      for (let j = 0n; j < cC.arity; j++) {
+        console.group("j ==", j);
+        let idx = j + cO;
+        backtracking: for (let k = i - 1; k >= 0; k--) {
+          console.log("k", i - 1, ">=", k, ">=", 0);
+          const [, [pO, pS]] = diagram[k];
+          const pC = machineGrammar.generators.get(pS)!;
+          if (idx < pO) continue backtracking;
+          if (idx >= pO + pC.coarity) {
+            idx += pC.arity - pC.coarity;
+            continue backtracking;
+          }
+          const s = Number(idx - pO);
+          const source = { id: k.toString(), port: `${k}.c.${s}` };
+          const target = { id: i.toString(), port: `${i}.d.${j}` };
+          console.log("S/T", source, target);
+          cells.push({ type: "custom.Link", source, target });
+          break backtracking;
+        }
+        console.groupEnd();
+      }
+      console.groupEnd();
+      console.groupEnd();
+    }
+    console.groupEnd();
+
+    console.log(cells);
+
+    this.graph.fromJSON({ cells });
+    this.paper.transformToFitContent({
+      useModelGeometry: true,
+      padding: 10,
+    });
   }
 }
