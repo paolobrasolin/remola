@@ -2,6 +2,89 @@ import { Controller } from "@hotwired/stimulus";
 
 import * as joint from "jointjs";
 
+const NAMESPACE = {
+  ...joint.shapes,
+  custom: {
+    Model: joint.shapes.devs.Model.define(
+      "custom.Model",
+      {
+        size: {
+          width: 40,
+          height: 40,
+        },
+        attrs: {
+          ".": {
+            magnet: false,
+          },
+          ".label": {
+            text: "?",
+            "ref-x": 20,
+            "ref-y": 20,
+            "font-size": 20,
+            // "text-anchor": "middle",
+            // "dominant-baseline": "central",
+            y: "0.3em",
+            // fill: "red",
+          },
+          ".body": {
+            "ref-width": "100%",
+            "ref-height": "100%",
+            stroke: "#000",
+          },
+        },
+        ports: {
+          groups: {
+            in: {
+              attrs: {
+                ".port-label": { hidden: "true", "font-size": "xx-small" },
+                ".port-body": { fill: "black", stroke: "#000", r: 2 },
+              },
+              label: { position: { name: "center", args: { y: 0 } } },
+            },
+            out: {
+              attrs: {
+                ".port-label": { hidden: "true", "font-size": "xx-small" },
+                ".port-body": { fill: "black", stroke: "#000", r: 2 },
+              },
+              label: { position: { name: "center", args: { y: 0 } } },
+            },
+          },
+        },
+      },
+      {},
+      {
+        size: {
+          width: 20,
+          height: 20,
+        },
+      }
+    ),
+    Link: joint.dia.Link.define(
+      "custom.Link",
+      {
+        attrs: {
+          line: {
+            connection: true,
+            stroke: "black",
+            strokeWidth: 2,
+          },
+        },
+      },
+      {
+        markup: [
+          {
+            tagName: "path",
+            selector: "line",
+            attributes: {
+              fill: "none",
+            },
+          },
+        ],
+      }
+    ),
+  },
+};
+
 import PaperNavigator from "../components/paper_navigator";
 import {
   Composable,
@@ -18,9 +101,7 @@ export default class extends Controller {
   paper!: joint.dia.Paper;
 
   connect() {
-    const namespace = joint.shapes;
-
-    this.graph = new joint.dia.Graph({}, { cellNamespace: namespace });
+    this.graph = new joint.dia.Graph({}, { cellNamespace: NAMESPACE });
 
     this.paper = new joint.dia.Paper({
       el: this.containerTarget,
@@ -30,7 +111,7 @@ export default class extends Controller {
       background: {
         color: "rgba(240, 255, 250, 0.5)",
       },
-      cellViewNamespace: namespace,
+      cellViewNamespace: NAMESPACE,
       // gridSize: 10,
       drawGrid: true,
       interactive: {
@@ -62,140 +143,7 @@ export default class extends Controller {
       },
     });
 
-    (namespace as any).custom = {
-      Model: joint.shapes.devs.Model.define(
-        "custom.Model",
-        {
-          size: {
-            width: 40,
-            height: 40,
-          },
-          attrs: {
-            ".": {
-              magnet: false,
-            },
-            ".label": {
-              text: "?",
-              "ref-x": 20,
-              "ref-y": 20,
-              "font-size": 20,
-              // "text-anchor": "middle",
-              // "dominant-baseline": "central",
-              y: "0.3em",
-              // fill: "red",
-            },
-            ".body": {
-              "ref-width": "100%",
-              "ref-height": "100%",
-              stroke: "#000",
-            },
-          },
-          ports: {
-            groups: {
-              in: {
-                attrs: {
-                  ".port-label": { hidden: "true", "font-size": "xx-small" },
-                  ".port-body": { fill: "black", stroke: "#000", r: 2 },
-                },
-                label: { position: { name: "center", args: { y: 0 } } },
-              },
-              out: {
-                attrs: {
-                  ".port-label": { hidden: "true", "font-size": "xx-small" },
-                  ".port-body": { fill: "black", stroke: "#000", r: 2 },
-                },
-                label: { position: { name: "center", args: { y: 0 } } },
-              },
-            },
-          },
-        },
-        {},
-        {
-          size: {
-            width: 20,
-            height: 20,
-          },
-        }
-      ),
-      Link: joint.dia.Link.define(
-        "custom.Link",
-        {
-          attrs: {
-            line: {
-              connection: true,
-              stroke: "black",
-              strokeWidth: 2,
-            },
-          },
-        },
-        {
-          markup: [
-            {
-              tagName: "path",
-              selector: "line",
-              attributes: {
-                fill: "none",
-              },
-            },
-          ],
-        }
-      ),
-    };
-
     new PaperNavigator(this.paper);
-
-    // this.graph.fromJSON({
-    //   cells: [
-    //     {
-    //       type: "custom.Model",
-    //       inPorts: [],
-    //       outPorts: ["Ao"],
-    //       id: "0",
-    //       position: { x: 0, y: 0 },
-    //     },
-    //     {
-    //       type: "custom.Model",
-    //       inPorts: ["Ai"],
-    //       outPorts: ["Bo", "Ao", "X"],
-    //       id: "(",
-    //       position: { x: 200, y: 0 },
-    //     },
-    //     {
-    //       type: "custom.Model",
-    //       inPorts: ["Bi", "Ai"],
-    //       outPorts: ["Ao"],
-    //       id: ")",
-    //       position: { x: 400, y: 0 },
-    //     },
-    //     {
-    //       type: "custom.Model",
-    //       inPorts: ["Ai"],
-    //       outPorts: [],
-    //       id: "1",
-    //       position: { x: 600, y: 0 },
-    //     },
-    //     {
-    //       type: "custom.Link",
-    //       source: { id: "0", port: "Ao" },
-    //       target: { id: "(", port: "Ai" },
-    //     },
-    //     {
-    //       type: "custom.Link",
-    //       source: { id: "(", port: "Ao" },
-    //       target: { id: ")", port: "Ai" },
-    //     },
-    //     {
-    //       type: "custom.Link",
-    //       source: { id: "(", port: "Bo" },
-    //       target: { id: ")", port: "Bi" },
-    //     },
-    //     {
-    //       type: "custom.Link",
-    //       source: { id: ")", port: "Ao" },
-    //       target: { id: "1", port: "Ai" },
-    //     },
-    //   ],
-    // });
 
     // this.paper.transformToFitContent({
     //   useModelGeometry: true,
