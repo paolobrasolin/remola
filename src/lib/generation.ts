@@ -71,3 +71,37 @@ export function explore(
     bits
   );
 }
+
+export function exploreWithEdges(
+  sigs: Composable[],
+  store: Map<Signature, Map<Signature, [bigint, symbol, Composable]>>,
+  depth: bigint,
+  generators: Composable[],
+  bits: BitSize
+) {
+  if (depth < 1n) return;
+  const other = new Set<Composable>();
+  sigs.forEach((sig) => {
+    if (!store.has(sig.codomain))
+      store.set(
+        sig.codomain,
+        new Map<Signature, [bigint, symbol, Composable]>()
+      );
+    generators.forEach((g) => {
+      // if (g.dom.arity < 1n) return; // TODO: is this actually right?
+      const compositions = listCompositions(sig, g, bits);
+      compositions.forEach(([o, f]) => {
+        store.get(sig.codomain)?.set(f.codomain, [o, g.name!, f]);
+        other.add(f);
+      });
+    });
+  });
+
+  exploreWithEdges(
+    [...other].filter((x) => !store.has(x.codomain)),
+    store,
+    depth - 1n,
+    generators,
+    bits
+  );
+}

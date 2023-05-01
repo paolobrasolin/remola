@@ -3,6 +3,7 @@ export type Signature = bigint;
 export type BitSize = bigint;
 
 export interface Composable {
+  name?: symbol;
   arity: Arity;
   domain: Signature;
   coarity: Arity;
@@ -32,9 +33,11 @@ export function indicesToSignature(indices: bigint[], bits: bigint): Signature {
 export function indicesToGenerator(
   domIndices: bigint[],
   codIndices: bigint[],
-  bits: bigint
+  bits: bigint,
+  name?: symbol
 ): Generator {
   return {
+    name: name,
     arity: BigInt(domIndices.length),
     domain: indicesToSignature(domIndices, bits),
     coarity: BigInt(codIndices.length),
@@ -79,7 +82,8 @@ export function encodeGeneratorsInGrammar(
       indicesToGenerator(
         dom.map((k) => alphabet.get(Symbol.for(k))!),
         cod.map((k) => alphabet.get(Symbol.for(k))!),
-        bits
+        bits,
+        Symbol.for(key)
       ),
     ])
   );
