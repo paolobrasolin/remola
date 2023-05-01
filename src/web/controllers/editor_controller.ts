@@ -76,6 +76,10 @@ export default class extends Controller {
     });
 
     this.editor.setValue(DEFAULT);
+
+    new ResizeObserver((en) => {
+      this.editor.layout();
+    }).observe(this.containerTarget);
   }
 
   disconnect() {

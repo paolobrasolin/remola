@@ -30,25 +30,27 @@
   </nav>
 
   <main role="region" aria-live="polite" class="bg-slate-50 h-full" data-controller="main editor list graph diagram"
-    data-action="
+    data-tab-target="region" data-action="
 editor:grammarChanged->main#ingestGrammar
 main:optionsChanged->list#ingestOptions
 list:selectionChanged->main#ingestSelection
 main:diagramChanged->diagram#ingestDiagram
 main:graphChanged->graph#ingestGraph
     ">
-    <section role="tabpanel" id="diagram-tabpanel" aria-labelledby="diagram-tab" class="h-full">
-      <div class="w-full h-full" data-diagram-target="container"></div>
-    </section>
-    <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" class="h-full">
-      <div class="w-full h-full" data-graph-target="container"></div>
-    </section>
-    <section role="tabpanel" id="list-tabpanel" aria-labelledby="list-tab">
-      <select multiple class="w-full h-full" data-list-target="container"></select>
-    </section>
-    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full">
+    <section role="tabpanel" id="grammar-tabpanel" aria-labelledby="grammar-tab" class="h-full" data-tab-target="panel">
       <div class="w-full h-full" data-editor-target="container"></div>
     </section>
+    <section role="tabpanel" id="explorer-tabpanel" aria-labelledby="explorer-tab" class="h-full"
+      data-tab-target="panel">
+      <div class="w-full h-full" data-graph-target="container"></div>
+    </section>
+    <section role="tabpanel" id="list-tabpanel" aria-labelledby="list-tab" data-tab-target="panel">
+      <select multiple class="w-full h-full" data-list-target="container"></select>
+    </section>
+    <section role="tabpanel" id="diagram-tabpanel" aria-labelledby="diagram-tab" class="h-full" data-tab-target="panel">
+      <div class="w-full h-full" data-diagram-target="container"></div>
+    </section>
+    <button draggable="true" id="handle" data-tab-target="handle"></button>
   </main>
 
   <script type="module" src="index.ts"></script>

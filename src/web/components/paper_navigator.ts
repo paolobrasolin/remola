@@ -28,7 +28,11 @@ export default class {
 
   bindEvents() {
     this.paper.on("blank:pointerdblclick", () => {
-      this.paper.transformToFitContent();
+      this.paper.transformToFitContent({
+        useModelGeometry: true,
+        verticalAlign: "middle",
+        horizontalAlign: "middle",
+      });
     });
     this.paper.on("blank:pointerdown", ({ originalEvent }) => {
       if (originalEvent instanceof TouchEvent) {

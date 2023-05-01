@@ -36,7 +36,17 @@
 
   main {
     @apply grid;
-    grid-template-columns: repeat(2, 50%);
+    grid-template-columns: 40% 60%;
     grid-template-rows: repeat(2, 50%)
   }
+
+  #handle {
+    z-index: 10000;
+    @apply absolute rounded-full bg-red-800 cursor-move opacity-0 hover:opacity-50;
+    left: calc(40% - 15px);
+    top: calc(50% - 15px);
+    width: 30px;
+    height: 30px;
+  }
+
 }

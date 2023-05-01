@@ -145,10 +145,9 @@ export default class extends Controller {
 
     new PaperNavigator(this.paper);
 
-    // this.paper.transformToFitContent({
-    //   useModelGeometry: true,
-    //   padding: 10,
-    // });
+    new ResizeObserver(joint.util.debounce(this.refocus.bind(this))).observe(
+      this.containerTarget
+    );
   }
 
   disconnect() {
@@ -217,9 +216,14 @@ export default class extends Controller {
     console.log(cells);
 
     this.graph.fromJSON({ cells });
+    this.refocus();
+  }
+
+  refocus() {
     this.paper.transformToFitContent({
       useModelGeometry: true,
-      padding: 10,
+      verticalAlign: "middle",
+      horizontalAlign: "middle",
     });
   }
 }
