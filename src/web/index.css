@@ -23,6 +23,7 @@
 @layer components {
   [role=tablist]{
     @apply flex border-b text-lg font-medium bg-slate-100;
+    @apply hidden;
   }
 
   [role=tab]{
