@@ -45,7 +45,15 @@ export default class extends Controller {
         .join(" ; ");
       return { value: i.toString(), label: label };
     });
+
     this.dispatch("optionsChanged", { detail: { options } });
+    this.dispatch("graphChanged", {
+      detail: {
+        graph: this.graphStore,
+        humanGrammar: this.humanGrammar,
+        machineGrammar: this.machineGrammar,
+      },
+    });
   }
 
   findPaths(
