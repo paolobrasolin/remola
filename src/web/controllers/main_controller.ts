@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 import {
   HumanGrammar,
+  MachineGrammar,
   Signature,
   humanToMachineGrammar,
   indicesToGenerator,
@@ -8,19 +9,28 @@ import {
 import { explore } from "../../lib/generation";
 
 export default class extends Controller {
+  machineGrammar!: MachineGrammar;
+  graphStore!: Map<bigint, Set<bigint>>;
+  diagramsStore!: bigint[][];
+
   ingestGrammar({
     detail: { grammar },
   }: CustomEvent<{ grammar: HumanGrammar }>) {
-    const machineGrammar = humanToMachineGrammar(grammar);
+    this.machineGrammar = humanToMachineGrammar(grammar);
+    this.graphStore = new Map();
+    this.diagramsStore = [];
 
-    const seed = [indicesToGenerator([], [], machineGrammar.bits)];
-    const store = new Map<bigint, Set<bigint>>();
+    explore(
+      [indicesToGenerator([], [], this.machineGrammar.bits)], // seeding w/ empty signature
+      this.graphStore,
+      4n, //up to depth 4
+      [...this.machineGrammar.generators.values()],
+      this.machineGrammar.bits
+    );
 
-    const generators = [...machineGrammar.generators.values()];
-    explore(seed, store, 4n, generators, machineGrammar.bits);
+    this.diagramsStore = this.findPaths(this.graphStore, 0b00n, 0b00n, 10);
 
-    const paths = this.findPaths(store, 0b00n, 0b00n, 10);
-    const options = paths.map((v, i) => {
+    const options = this.diagramsStore.map((v, i) => {
       return { value: i.toString(), label: v.toString() };
     });
     this.dispatch("optionsChanged", { detail: { options } });
@@ -57,5 +67,11 @@ export default class extends Controller {
 
     dfs([startNode]);
     return result;
+  }
+
+  ingestSelection({
+    detail: { selection },
+  }: CustomEvent<{ selection: string }>) {
+    console.log(this.diagramsStore[parseInt(selection)]);
   }
 }
