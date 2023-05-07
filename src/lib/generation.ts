@@ -10,8 +10,11 @@ export function listCompositionOffsets(
   for (let offset = 0n; offset <= lho.coarity - rho.arity; offset++) {
     const bitLength = rho.arity * bits;
     const bitOffset = offset * bits;
-    const body =
-      (lho.codomain & (bits ** (bitLength + bitOffset) - 1n)) >> bitOffset;
+    const bitMask =
+      bits === 1n
+        ? bitLength + bitOffset
+        : bits ** (bitLength + bitOffset) - 1n;
+    const body = (lho.codomain & bitMask) >> bitOffset;
     if (body == rho.domain) results.push(offset);
   }
   return results;

@@ -1,12 +1,22 @@
-import { Composable, indicesToGenerator } from "./encoding";
+import {
+  Composable,
+  MachineGrammar,
+  humanToMachineGrammar,
+  indicesToGenerator,
+} from "./encoding";
 import {
   listCompositions,
   explore,
   listCompositionOffsets,
+  exploreWithEdges,
 } from "./generation";
 
 describe("listCompositionOffsets", () => {
   test.each([
+    { bits: 1, cod: [], dom: [], exp: [0] }, // TODO: debatable
+    { bits: 1, cod: [1], dom: [], exp: [] }, // TODO: debatable
+    { bits: 1, cod: [], dom: [1], exp: [] },
+    { bits: 1, cod: [1], dom: [1], exp: [0] },
     { bits: 2, cod: [], dom: [], exp: [0] }, // TODO: debatable
     { bits: 2, cod: [1], dom: [], exp: [] }, // TODO: debatable
     { bits: 2, cod: [], dom: [1], exp: [] },
@@ -39,6 +49,12 @@ describe("listCompositions", () => {
     rho: { dom: number[]; cod: number[] };
     exp: [number, { dom: number[]; cod: number[] }][];
   }>([
+    {
+      bits: 1,
+      lho: { dom: [], cod: [1] },
+      rho: { dom: [1], cod: [] },
+      exp: [[0, { dom: [], cod: [] }]],
+    },
     {
       bits: 2,
       lho: { dom: [], cod: [1] },
