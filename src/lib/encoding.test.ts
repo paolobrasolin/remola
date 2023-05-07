@@ -53,63 +53,55 @@ test("encodeTypesInGrammar", () => {
   );
 });
 
-test("humanToMachineGrammar", () => {
-  const grammar: HumanGrammar = {
-    "0": { dom: [], cod: ["A"] },
-    "(": { dom: ["A"], cod: ["B", "A"] },
-    ")": { dom: ["B", "A"], cod: ["A"] },
-    "1": { dom: ["A"], cod: [] },
-  };
-
-  const expected: MachineGrammar = {
-    bits: 2n,
-    alphabet: new Map([
-      [Symbol.for("A"), 0b01n],
-      [Symbol.for("B"), 0b10n],
-    ]),
-    generators: new Map([
-      [
-        Symbol.for("0"),
-        {
-          name: Symbol.for("0"),
-          arity: 0n,
-          domain: 0b0n,
-          coarity: 1n,
-          codomain: 0b01n,
-        },
-      ],
-      [
-        Symbol.for("("),
-        {
-          name: Symbol.for("("),
-          arity: 1n,
-          domain: 0b01n,
-          coarity: 2n,
-          codomain: 0b01_10n,
-        },
-      ],
-      [
-        Symbol.for(")"),
-        {
-          name: Symbol.for(")"),
-          arity: 2n,
-          domain: 0b01_10n,
-          coarity: 1n,
-          codomain: 0b01n,
-        },
-      ],
-      [
-        Symbol.for("1"),
-        {
-          name: Symbol.for("1"),
-          arity: 1n,
-          domain: 0b01n,
-          coarity: 0n,
-          codomain: 0b0n,
-        },
-      ],
-    ]),
-  };
-
-  expect(humanToMachineGrammar(grammar)).toStrictEqual(expected);
+describe("humanToMachineGrammar", () => {
+  test.each<{
+    grammarName: string;
+    humanGrammar: HumanGrammar;
+    flatMachineGrammar: {
+      bits: bigint;
+      alphabet: [symbol, bigint][];
+      generators: [symbol, bigint, bigint, bigint, bigint][];
+    };
+  }>([
+    {
+      grammarName: "Balanced parentheses",
+      humanGrammar: {
+        "0": { dom: [], cod: ["A"] },
+        "(": { dom: ["A"], cod: ["B", "A"] },
+        ")": { dom: ["B", "A"], cod: ["A"] },
+        "1": { dom: ["A"], cod: [] },
+      },
+      flatMachineGrammar: {
+        bits: 2n,
+        alphabet: [
+          [Symbol.for("A"), 0b01n],
+          [Symbol.for("B"), 0b10n],
+        ],
+        generators: [
+          [Symbol.for("0"), 0n, 0b0n, 1n, 0b01n],
+          [Symbol.for("("), 1n, 0b01n, 2n, 0b01_10n],
+          [Symbol.for(")"), 2n, 0b01_10n, 1n, 0b01n],
+          [Symbol.for("1"), 1n, 0b01n, 0n, 0b0n],
+        ],
+      },
+    },
+  ])(
+    "$grammarName",
+    ({
+      grammarName,
+      humanGrammar,
+      flatMachineGrammar: { bits, alphabet, generators },
+    }) => {
+      const machineGrammar: MachineGrammar = {
+        bits,
+        alphabet: new Map(alphabet),
+        generators: new Map(
+          generators.map(([name, arity, domain, coarity, codomain]) => {
+            return [name, { name, arity, domain, coarity, codomain }];
+          })
+        ),
+      };
+      expect(humanToMachineGrammar(humanGrammar)).toStrictEqual(machineGrammar);
+    }
+  );
 });
