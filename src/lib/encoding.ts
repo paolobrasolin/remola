@@ -47,7 +47,9 @@ export function indicesToGenerator(
 
 export function humanToMachineGrammar(grammar: HumanGrammar): MachineGrammar {
   const alphabet = encodeTypesInGrammar(grammar);
-  const bits = BigInt(1 + Math.floor(Math.log2(alphabet.size)));
+  const bits = alphabet.size
+    ? BigInt(1 + Math.floor(Math.log2(alphabet.size)))
+    : 0n;
   const generators = encodeGeneratorsInGrammar(grammar, alphabet, bits);
   return { bits, alphabet, generators };
 }
