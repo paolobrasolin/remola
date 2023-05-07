@@ -7,5 +7,6 @@
   "notify": false,
   "testEnvironment": "node",
   "testRegex": "/src/.+\\.(test|spec)\\.ts$",
+  "maxWorkers": 1,
   "roots": ["<rootDir>/src"]
 }
