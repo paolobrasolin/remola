@@ -32,6 +32,7 @@ export function listCompositions(
     codomain |= lho.codomain & (bits ** (offset * bits) - 1n);
     const coarity = lho.coarity + rho.coarity - rho.arity;
     const composition = {
+      name: undefined,
       arity: lho.arity,
       domain: lho.domain,
       coarity: coarity,

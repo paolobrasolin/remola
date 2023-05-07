@@ -70,19 +70,43 @@ test("humanToMachineGrammar", () => {
     generators: new Map([
       [
         Symbol.for("0"),
-        { arity: 0n, domain: 0b0n, coarity: 1n, codomain: 0b01n },
+        {
+          name: Symbol.for("0"),
+          arity: 0n,
+          domain: 0b0n,
+          coarity: 1n,
+          codomain: 0b01n,
+        },
       ],
       [
         Symbol.for("("),
-        { arity: 1n, domain: 0b01n, coarity: 2n, codomain: 0b01_10n },
+        {
+          name: Symbol.for("("),
+          arity: 1n,
+          domain: 0b01n,
+          coarity: 2n,
+          codomain: 0b01_10n,
+        },
       ],
       [
         Symbol.for(")"),
-        { arity: 2n, domain: 0b01_10n, coarity: 1n, codomain: 0b01n },
+        {
+          name: Symbol.for(")"),
+          arity: 2n,
+          domain: 0b01_10n,
+          coarity: 1n,
+          codomain: 0b01n,
+        },
       ],
       [
         Symbol.for("1"),
-        { arity: 1n, domain: 0b01n, coarity: 0n, codomain: 0b0n },
+        {
+          name: Symbol.for("1"),
+          arity: 1n,
+          domain: 0b01n,
+          coarity: 0n,
+          codomain: 0b0n,
+        },
       ],
     ]),
   };
