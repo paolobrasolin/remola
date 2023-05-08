@@ -18,6 +18,7 @@ const NAMESPACE = {
           },
           ".label": {
             text: "?",
+            "font-family": "Linux Libertine O",
             "ref-x": 20,
             "ref-y": 20,
             "font-size": 20,

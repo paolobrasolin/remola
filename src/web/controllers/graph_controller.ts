@@ -45,6 +45,7 @@ const STYLE: Stylesheet[] = [
     style: {
       label: "data(label)",
       "font-size": "1em",
+      "font-family": "Linux Libertine O",
       "text-background-color": "white",
       "text-background-opacity": 1,
       "text-background-padding": "2px",
@@ -88,7 +89,7 @@ export default class extends Controller {
     }
 
     for (const [source, targets] of graph.entries()) {
-      for (const [target, [off, s]] of targets) {
+      for (const [target, [off, s, dee]] of targets) {
         if (!graph.has(target))
           this.cy.add({ data: { id: target.toString(36) } });
 
@@ -97,10 +98,21 @@ export default class extends Controller {
           .split("")
           .map((d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[parseInt(d)]);
 
+        const sub = (
+          dee.coarity -
+          off -
+          machineGrammar.generators.get(s)!.coarity
+        )
+          .toString()
+          .split("")
+          .map((d) => "₀₁₂₃₄₅₆₇₈₉"[parseInt(d)]);
+
+        // TODO: interleave sub/sup when they're more than a character long
+
         const data = {
           source: source.toString(36),
           target: target.toString(36),
-          label: `${Symbol.keyFor(s)}${sup}`,
+          label: `${Symbol.keyFor(s)}${sub}${sup}`,
         };
         this.cy.add({ data });
       }

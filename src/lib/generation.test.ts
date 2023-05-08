@@ -142,3 +142,29 @@ test("explore", () => {
     ])
   );
 });
+
+test("exploreWithEdges", () => {
+  const machineGrammar = humanToMachineGrammar({
+    "0": { dom: [], cod: ["A"] },
+    "1": { dom: ["A"], cod: [] },
+  });
+
+  const graphStore = new Map();
+
+  const head: Composable = {
+    arity: 0n,
+    domain: 0n,
+    coarity: 0n,
+    codomain: 0n,
+  };
+
+  exploreWithEdges(
+    [head],
+    graphStore,
+    3n,
+    [...machineGrammar.generators.values()],
+    machineGrammar.bits
+  );
+
+  expect(graphStore).toStrictEqual(new Map());
+});

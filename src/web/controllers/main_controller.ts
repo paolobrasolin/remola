@@ -40,7 +40,16 @@ export default class extends Controller {
             .toString()
             .split("")
             .map((d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[parseInt(d)]);
-          return `${Symbol.keyFor(name)}${sup}`;
+          const sub = (
+            com.coarity -
+            off -
+            this.machineGrammar.generators.get(name)!.coarity
+          )
+            .toString()
+            .split("")
+            .map((d) => "₀₁₂₃₄₅₆₇₈₉"[parseInt(d)]);
+          // TODO: interleave sub/sup when they're more than a character long
+          return `${Symbol.keyFor(name)}${sub}${sup}`;
         })
         .join(" ; ");
       return { value: i.toString(), label: label };

@@ -49,4 +49,11 @@
     height: 30px;
   }
 
+  select {
+    font-family: 'Linux Libertine O', sans-serif;
+    /* font-family: 'Linux Libertine Display O', sans-serif; */
+    /* font-family: 'Linux Libertine Initials O', sans-serif; */
+    /* font-family: 'Linux Libertine Mono O', sans-serif; */
+  }
+
 }
