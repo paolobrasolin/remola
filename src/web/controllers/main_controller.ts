@@ -12,8 +12,19 @@ import { explore, exploreWithEdges } from "../../lib/generation";
 export default class extends Controller {
   humanGrammar!: HumanGrammar;
   machineGrammar!: MachineGrammar;
-  graphStore!: Map<bigint, Map<Signature, [bigint, symbol, Composable]>>;
+  graphStore!: Map<bigint, Map<Signature, [bigint, symbol, Composable][]>>;
   diagramsStore!: [Signature, [bigint, symbol, Composable]][][];
+
+  graphDepth!: number;
+  pathLength!: number;
+  unsafe!: boolean;
+
+  connect() {
+    const params = new URLSearchParams(window.location.search);
+    this.unsafe = params.get("unsafe") == "true";
+    this.graphDepth = parseInt(params.get("graphDepth") || "") || 4;
+    this.pathLength = parseInt(params.get("pathLength") || "") || 6;
+  }
 
   ingestGrammar({
     detail: { grammar },
@@ -26,12 +37,38 @@ export default class extends Controller {
     exploreWithEdges(
       [indicesToGenerator([], [], this.machineGrammar.bits)], // seeding w/ empty signature
       this.graphStore,
-      6n, //up to depth 4
+      BigInt(this.graphDepth),
       [...this.machineGrammar.generators.values()],
-      this.machineGrammar.bits
+      this.machineGrammar.bits,
+      this.unsafe
     );
 
-    this.diagramsStore = this.findPaths(this.graphStore, 0b00n, 0b00n, 10);
+    // NOTE: removing sinks is a quick way to simplify the graph
+    this.graphStore.forEach((edges, sourceSig) => {
+      edges.forEach((compositions, targetSig) => {
+        if (
+          this.graphStore.has(targetSig) &&
+          this.graphStore.get(targetSig)!.size >= 0
+        )
+          return;
+        edges.delete(targetSig);
+      });
+    });
+
+    this.dispatch("graphChanged", {
+      detail: {
+        graph: this.graphStore,
+        humanGrammar: this.humanGrammar,
+        machineGrammar: this.machineGrammar,
+      },
+    });
+
+    this.diagramsStore = this.findPaths(
+      this.graphStore,
+      0b00n,
+      0b00n,
+      this.pathLength
+    );
 
     const options = this.diagramsStore.map((dia, i) => {
       const label = dia
@@ -56,17 +93,10 @@ export default class extends Controller {
     });
 
     this.dispatch("optionsChanged", { detail: { options } });
-    this.dispatch("graphChanged", {
-      detail: {
-        graph: this.graphStore,
-        humanGrammar: this.humanGrammar,
-        machineGrammar: this.machineGrammar,
-      },
-    });
   }
 
   findPaths(
-    adjMat: Map<Signature, Map<Signature, [bigint, symbol, Composable]>>,
+    adjMat: Map<Signature, Map<Signature, [bigint, symbol, Composable][]>>,
     headSignature: Signature,
     tailSignature: Signature,
     maxPathLength: number,
@@ -88,11 +118,14 @@ export default class extends Controller {
 
       const neighbors =
         adjMat.get(currentNodeSig) ||
-        new Map<Signature, [bigint, symbol, Composable]>();
-      for (const neighbor of neighbors) {
-        path.push(neighbor);
-        dfs(path);
-        path.pop();
+        new Map<Signature, [bigint, symbol, Composable][]>();
+
+      for (const [a, b] of neighbors) {
+        for (const c of b) {
+          path.push([a, c]);
+          dfs(path);
+          path.pop();
+        }
       }
     }
 

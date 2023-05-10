@@ -74,7 +74,7 @@ export default class extends Controller {
   ingestGraph({
     detail: { graph, humanGrammar, machineGrammar },
   }: CustomEvent<{
-    graph: Map<bigint, Map<bigint, [bigint, symbol, Composable]>>;
+    graph: Map<bigint, Map<bigint, [bigint, symbol, Composable][]>>;
     humanGrammar: HumanGrammar;
     machineGrammar: MachineGrammar;
   }>) {
@@ -89,32 +89,40 @@ export default class extends Controller {
     }
 
     for (const [source, targets] of graph.entries()) {
-      for (const [target, [off, s, dee]] of targets) {
-        if (!graph.has(target))
-          this.cy.add({ data: { id: target.toString(36) } });
+      for (const [target, complist] of targets) {
+        for (const [off, s, dee] of complist) {
+          // NOTE: we need to check cy here, not the graph store
+          if (!this.cy.hasElementWithId(target.toString(36))) {
+            const data = {
+              id: target.toString(36),
+              label: null,
+            };
+            this.cy.add({ data });
+          }
 
-        const sup = off
-          .toString()
-          .split("")
-          .map((d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[parseInt(d)]);
+          const sup = off
+            .toString()
+            .split("")
+            .map((d) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[parseInt(d)]);
 
-        const sub = (
-          dee.coarity -
-          off -
-          machineGrammar.generators.get(s)!.coarity
-        )
-          .toString()
-          .split("")
-          .map((d) => "₀₁₂₃₄₅₆₇₈₉"[parseInt(d)]);
+          const sub = (
+            dee.coarity -
+            off -
+            machineGrammar.generators.get(s)!.coarity
+          )
+            .toString()
+            .split("")
+            .map((d) => "₀₁₂₃₄₅₆₇₈₉"[parseInt(d)]);
 
-        // TODO: interleave sub/sup when they're more than a character long
+          // TODO: interleave sub/sup when they're more than a character long
 
-        const data = {
-          source: source.toString(36),
-          target: target.toString(36),
-          label: `${Symbol.keyFor(s)}${sub}${sup}`,
-        };
-        this.cy.add({ data });
+          const data = {
+            source: source.toString(36),
+            target: target.toString(36),
+            label: `${Symbol.keyFor(s)}${sub}${sup}`,
+          };
+          this.cy.add({ data });
+        }
       }
     }
 

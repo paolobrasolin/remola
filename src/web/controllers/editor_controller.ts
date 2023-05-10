@@ -75,7 +75,8 @@ export default class extends Controller {
       this.dispatch("grammarChanged", { detail: { grammar } });
     });
 
-    this.editor.setValue(DEFAULT);
+    const params = new URLSearchParams(window.location.search);
+    this.editor.setValue(params.get("grammar") || DEFAULT);
 
     new ResizeObserver((en) => {
       this.editor.layout();
